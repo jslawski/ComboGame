@@ -4,7 +4,8 @@ using InControl;
 
 public class Ability : MonoBehaviour {
 	public Character thisPlayer;			//The player who has this ability
-	public KeyCode activateKey;             //Button used to activate the ability
+	public KeyCode activateKey;             //Keyboard key used to activate the ability
+	public InputControl activateButton;		//Controller button used to activate the ability
 
 	public float manaCost;					//How much mana it costs to use this ability
 
@@ -19,7 +20,7 @@ public class Ability : MonoBehaviour {
 	
 	// Update is called once per frame
 	protected virtual void Update () {
-		if (Input.GetKeyDown(activateKey) && cooldownRemaining <= 0) {
+		if ((Input.GetKeyDown(activateKey) || (activateButton != null && activateButton.IsPressed)) && cooldownRemaining <= 0) {
 			Activate();
 		}
 

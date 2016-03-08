@@ -11,6 +11,7 @@ public class Dash : Ability {
 
 		cooldown = 2f;
 		activateKey = KeyCode.Q;
+		activateButton = thisPlayer.curDevice.LeftTrigger;
 	}
 
 	public override void Activate() {
