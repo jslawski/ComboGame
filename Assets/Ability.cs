@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using InControl;
 
 public class Ability : MonoBehaviour {
 	public Character thisPlayer;			//The player who has this ability

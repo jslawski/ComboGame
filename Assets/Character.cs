@@ -2,9 +2,12 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine.UI;
+using InControl;
 
 [RequireComponent(typeof(Rigidbody))]
 public class Character : MonoBehaviour, DamageableObject {
+	public InputDevice controller;
+
 	public List<Ability> abilities;
 
 	public float maxHealth;					//The player's maximum health/combo amount
@@ -35,6 +38,17 @@ public class Character : MonoBehaviour, DamageableObject {
 	
 	// Update is called once per frame
 	void Update () {
+		//If the controller hasn't been assigned yet
+		if (controller == null) {
+			//Assign it to whatever controller is active right now
+			if (InputManager.ActiveDevice != null) {
+				controller = InputManager.ActiveDevice;
+			}
+			//Or, if there aren't any active controllers, don't attempt to do anything on Update()
+			else {
+				return;
+			}
+		}
 		CharacterMovement();
 
 		CharacterAttack();
@@ -55,7 +69,7 @@ public class Character : MonoBehaviour, DamageableObject {
 	}
 
 	void CharacterAttack() {
-		if (Input.GetKeyDown(KeyCode.Q)) {
+		if (controller.Action1.WasPressed) {
 			timeSinceLastCombo = 0;
 		}
 	}
