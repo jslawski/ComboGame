@@ -6,8 +6,6 @@ using InControl;
 
 [RequireComponent(typeof(Rigidbody))]
 public class Character : MonoBehaviour, DamageableObject {
-	public InputDevice controller;
-
 	public List<Ability> abilities;
 
 	public float maxHealth;					//The player's maximum health/combo amount
@@ -22,6 +20,10 @@ public class Character : MonoBehaviour, DamageableObject {
 
 	public Rigidbody thisRigidbody;			//Reference to the attached Rigidbody
 	Collider thisCollider;                  //Reference to the attached Collider
+	Vector3 targetForward;					//Which direction the player should attempt to be facing
+	float turnSpeed = 0.4f;                 //(0-1) How quickly the player reaches the desired direction to face
+
+	bool controlsDisabled = false;
 
 	public InputDevice curDevice;
 
@@ -29,7 +31,7 @@ public class Character : MonoBehaviour, DamageableObject {
 	void Start () {
 		thisRigidbody = GetComponent<Rigidbody>();
 		thisCollider = GetComponent<Collider>();
-		curDevice = InputManager.ActiveDevice;
+		curDevice = (InputManager.ActiveDevice.Name == "NullInputDevice") ? null : InputManager.ActiveDevice;
 
 		//Debug characteristics and stats:
 		abilities.Add(this.gameObject.AddComponent<Dash>());
@@ -41,9 +43,14 @@ public class Character : MonoBehaviour, DamageableObject {
 	
 	// Update is called once per frame
 	void Update () {
-		CharacterMovement();
-
-		CharacterAttack();
+		if (curDevice == null) {
+			foreach (var device in InputManager.Devices) {
+				if (device.AnyButton) {
+					print("Button pressed");
+					curDevice = device;
+				}
+			}
+		}
 
 		//Lose health (combo) over time
 		timeSinceLastCombo += Time.deltaTime;
@@ -58,15 +65,27 @@ public class Character : MonoBehaviour, DamageableObject {
 		}
 		GetComponent<MeshRenderer>().material.SetFloat("_Percent", 1 - health / maxHealth);
 		GetComponentInChildren<TextMesh>().text = ((int)(health)).ToString();
+
+		CharacterMovement();
+
+		CharacterAttack();
+
 	}
 
 	void CharacterAttack() {
-		if (controller.Action1.WasPressed) {
+		if (controlsDisabled) {
+			return;
+		}
+
+		if (curDevice != null && curDevice.Action1.WasPressed) {
 			timeSinceLastCombo = 0;
 		}
 	}
 
 	void CharacterMovement() {
+		if (controlsDisabled) {
+			return;
+		}
 		/*~~~~~~~~~~~~~~~~~~~~~~~~DEBUG MOVESPEED CHANGE~~~~~~~~~~~~~~~~~~*/
 		if (Input.GetKeyDown(KeyCode.PageUp))
 			movespeed++;
@@ -74,42 +93,67 @@ public class Character : MonoBehaviour, DamageableObject {
 			movespeed--;
 		/*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-		if (curDevice.LeftStick.Vector.magnitude != 0) {
-			Move(curDevice.LeftStick.Vector);
+		//Controller movement
+		if (curDevice != null) {
+			if (curDevice.LeftStick.Vector.magnitude != 0) {
+				Move(curDevice.LeftStick.Vector);
+			}
+			else {
+				//If no direction is being pressed, decelerate the player
+				thisRigidbody.velocity = Vector3.Lerp(thisRigidbody.velocity, Vector3.zero, decelerationRate);
+			}
+			if (curDevice.RightStick.Vector.magnitude != 0) {
+				Turn(curDevice.RightStick.Vector);
+			}
 		}
-		if (curDevice.RightStick.Vector.magnitude != 0) {
-			Turn(curDevice.RightStick.Vector);
+		//Keyboard movement
+		else {
+			//Movement up
+			if (Input.GetKey(KeyCode.W)) {
+				Move(Vector3.forward);
+			}
+			//Movement down
+			else if (Input.GetKey(KeyCode.S)) {
+				Move(Vector3.back);
+			}
+
+			//Movement right
+			if (Input.GetKey(KeyCode.D)) {
+				Move(Vector3.right);
+			}
+			//Movement left
+			else if (Input.GetKey(KeyCode.A)) {
+				Move(Vector3.left);
+			}
+
+			//If no direction is being pressed, decelerate the player
+			if (!Input.GetKey(KeyCode.UpArrow) && !Input.GetKey(KeyCode.DownArrow) &&
+				!Input.GetKey(KeyCode.RightArrow) && !Input.GetKey(KeyCode.LeftArrow)) {
+				thisRigidbody.velocity = Vector3.Lerp(thisRigidbody.velocity, Vector3.zero, decelerationRate);
+			}
+
+			//Turning
+			if (Input.GetKey(KeyCode.UpArrow)) {
+				Turn(Vector3.Lerp(transform.forward, Vector3.forward, 0.3f));
+			}
+			else if (Input.GetKey(KeyCode.DownArrow)) {
+				Turn(Vector3.Lerp(transform.forward, Vector3.back, 0.3f));
+			}
+			else if (Input.GetKey(KeyCode.RightArrow)) {
+				Turn(Vector3.Lerp(transform.forward, Vector3.right, 0.3f));
+			}
+			else if (Input.GetKey(KeyCode.LeftArrow)) {
+				Turn(Vector3.Lerp(transform.forward, Vector3.left, 0.3f));
+			}
 		}
 
-		/*
-		//Movement up
-		if (Input.GetKey(KeyCode.UpArrow)) {
-			Move(Vector3.forward);
-		}
-		//Movement down
-		else if (Input.GetKey(KeyCode.DownArrow)) {
-			Move(Vector3.back);
-		}
-
-		//Movement right
-		if (Input.GetKey(KeyCode.RightArrow)) {
-			Move(Vector3.right);
-		}
-		//Movement left
-		else if (Input.GetKey(KeyCode.LeftArrow)) {
-			Move(Vector3.left);
-		}
-		*/
-		//If no direction is being pressed, decelerate the player
-		if (!Input.GetKey(KeyCode.UpArrow) && !Input.GetKey(KeyCode.DownArrow) &&
-			!Input.GetKey(KeyCode.RightArrow) && !Input.GetKey(KeyCode.LeftArrow)) {
-			thisRigidbody.velocity = Vector3.Lerp(thisRigidbody.velocity, Vector3.zero, decelerationRate);
-		}
 
 		//Limit the player's movement speed to the maximum movespeed
 		if (thisRigidbody.velocity.magnitude > movespeed) {
 			thisRigidbody.velocity = thisRigidbody.velocity.normalized * movespeed;
 		}
+		//Lerp the player's forward vector to the desired forward vector
+		transform.forward = Vector3.Lerp(transform.forward, targetForward, turnSpeed);
 	}
 	
 	void Move(Vector2 direction) {
@@ -129,7 +173,16 @@ public class Character : MonoBehaviour, DamageableObject {
 		Turn(new Vector3(facingDirection.x, 0, facingDirection.y));
 	}
 	void Turn(Vector3 facingDirection) {
-		transform.forward = facingDirection;
+		targetForward = facingDirection;
+	}
+
+	public void DisableControls(float duration) {
+		StartCoroutine(DisableControlsCoroutine(duration));
+	}
+	IEnumerator DisableControlsCoroutine(float duration) {
+		controlsDisabled = true;
+		yield return new WaitForSeconds(duration);
+		controlsDisabled = false;
 	}
 
 	public void TakeDamage(float damageIn) {
