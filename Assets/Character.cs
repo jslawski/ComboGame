@@ -6,6 +6,8 @@ using InControl;
 
 [RequireComponent(typeof(Rigidbody))]
 public class Character : MonoBehaviour, DamageableObject {
+	float bullet_time_scale_c = 0.05f;
+
 	public List<Ability> abilities;
 
 	public float maxHealth;					//The player's maximum health/combo amount
@@ -73,38 +75,30 @@ public class Character : MonoBehaviour, DamageableObject {
 			movespeed--;
 		/*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
+		if (curDevice.Action1) {
+			Time.timeScale = bullet_time_scale_c;
+			Time.fixedDeltaTime = 0.02f * bullet_time_scale_c;
+		}
+		else {
+			Time.timeScale = 1;
+			Time.fixedDeltaTime = 0.02f;
+		}
+
+		
+
 		if (curDevice.LeftStick.Vector.magnitude != 0) {
-			Move(curDevice.LeftStick.Vector);
+			Move(curDevice.LeftStick.Vector/Time.timeScale);
 		}
 		if (curDevice.RightStick.Vector.magnitude != 0) {
-			Turn(curDevice.RightStick.Vector);
+			Turn(curDevice.RightStick.Vector/Time.timeScale);
 		}
 
-		/*
-		//Movement up
-		if (Input.GetKey(KeyCode.UpArrow)) {
-			Move(Vector3.forward);
-		}
-		//Movement down
-		else if (Input.GetKey(KeyCode.DownArrow)) {
-			Move(Vector3.back);
-		}
-
-		//Movement right
-		if (Input.GetKey(KeyCode.RightArrow)) {
-			Move(Vector3.right);
-		}
-		//Movement left
-		else if (Input.GetKey(KeyCode.LeftArrow)) {
-			Move(Vector3.left);
-		}
-		*/
 		//If no direction is being pressed, decelerate the player
-		if (!Input.GetKey(KeyCode.UpArrow) && !Input.GetKey(KeyCode.DownArrow) &&
+		/*if (!Input.GetKey(KeyCode.UpArrow) && !Input.GetKey(KeyCode.DownArrow) &&
 			!Input.GetKey(KeyCode.RightArrow) && !Input.GetKey(KeyCode.LeftArrow)) {
 			thisRigidbody.velocity = Vector3.Lerp(thisRigidbody.velocity, Vector3.zero, decelerationRate);
 		}
-
+		*/
 		//Limit the player's movement speed to the maximum movespeed
 		if (thisRigidbody.velocity.magnitude > movespeed) {
 			thisRigidbody.velocity = thisRigidbody.velocity.normalized * movespeed;
@@ -115,7 +109,7 @@ public class Character : MonoBehaviour, DamageableObject {
 		Move(new Vector3(direction.x, 0, direction.y));
 	}
 	void Move(Vector3 direction) {
-		thisRigidbody.AddForce(direction * acceleration, ForceMode.Acceleration);
+		thisRigidbody.AddForce(((direction / Time.timeScale) * acceleration), ForceMode.Acceleration);
 		//thisRigidbody.AddForce(new Vector3(0, 0, acceleration), ForceMode.Acceleration);
 		//if (thisRigidbody.velocity.z > movespeed) {
 		//	Vector3 cur_vel = thisRigidbody.velocity;
