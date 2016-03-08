@@ -6,7 +6,10 @@ using InControl;
 
 [RequireComponent(typeof(Rigidbody))]
 public class Character : MonoBehaviour, DamageableObject {
+
 	float bullet_time_scale_c = 0.05f;
+
+	public InputDevice controller;
 
 	public List<Ability> abilities;
 
@@ -23,13 +26,11 @@ public class Character : MonoBehaviour, DamageableObject {
 	public Rigidbody thisRigidbody;			//Reference to the attached Rigidbody
 	Collider thisCollider;                  //Reference to the attached Collider
 
-	public InputDevice curDevice;
-
 	// Use this for initialization
 	void Start () {
 		thisRigidbody = GetComponent<Rigidbody>();
 		thisCollider = GetComponent<Collider>();
-		curDevice = InputManager.ActiveDevice;
+		controller = InputManager.ActiveDevice;
 
 		//Debug characteristics and stats:
 		abilities.Add(this.gameObject.AddComponent<Dash>());
@@ -41,7 +42,6 @@ public class Character : MonoBehaviour, DamageableObject {
 	
 	// Update is called once per frame
 	void Update () {
-
 		CharacterMovement();
 
 		CharacterAttack();
@@ -62,7 +62,7 @@ public class Character : MonoBehaviour, DamageableObject {
 	}
 
 	void CharacterAttack() {
-		if (Input.GetKeyDown(KeyCode.Q)) {
+		if (controller.Action1.WasPressed) {
 			timeSinceLastCombo = 0;
 		}
 	}
@@ -75,7 +75,7 @@ public class Character : MonoBehaviour, DamageableObject {
 			movespeed--;
 		/*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-		if (curDevice.Action1) {
+		if (controller.Action1) {
 			Time.timeScale = bullet_time_scale_c;
 			Time.fixedDeltaTime = 0.02f * bullet_time_scale_c;
 		}
@@ -86,11 +86,11 @@ public class Character : MonoBehaviour, DamageableObject {
 
 		
 
-		if (curDevice.LeftStick.Vector.magnitude != 0) {
-			Move(curDevice.LeftStick.Vector/Time.timeScale);
+		if (controller.LeftStick.Vector.magnitude != 0) {
+			Move(controller.LeftStick.Vector/Time.timeScale);
 		}
-		if (curDevice.RightStick.Vector.magnitude != 0) {
-			Turn(curDevice.RightStick.Vector/Time.timeScale);
+		if (controller.RightStick.Vector.magnitude != 0) {
+			Turn(controller.RightStick.Vector/Time.timeScale);
 		}
 
 		//If no direction is being pressed, decelerate the player
