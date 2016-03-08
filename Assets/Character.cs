@@ -6,7 +6,7 @@ using InControl;
 
 [RequireComponent(typeof(Rigidbody))]
 public class Character : MonoBehaviour, DamageableObject {
-	float bullet_time_scale_c = 0.05f;
+	float bulletTimeScale_c = 0.05f;
 
 	public InputDevice curDevice;
 	
@@ -97,6 +97,12 @@ public class Character : MonoBehaviour, DamageableObject {
 		
 		//Controller movement
 		if (curDevice != null) {
+			//Change back to normal-time
+			if (!curDevice.Action1) {
+				Time.timeScale = 1;
+				Time.fixedDeltaTime = 0.02f;
+			}
+
 			if (curDevice.LeftStick.Vector.magnitude != 0) {
 				Move(curDevice.LeftStick.Vector/Time.timeScale);
 			}
@@ -107,13 +113,11 @@ public class Character : MonoBehaviour, DamageableObject {
 			if (curDevice.RightStick.Vector.magnitude != 0) {
 				Turn(curDevice.RightStick.Vector/Time.timeScale);
 			}
+
+			//Change to bullet-time
 			if (curDevice.Action1) {
-				Time.timeScale = bullet_time_scale_c;
-				Time.fixedDeltaTime = 0.02f * bullet_time_scale_c;
-			}
-			else {
-				Time.timeScale = 1;
-				Time.fixedDeltaTime = 0.02f;
+				Time.timeScale = bulletTimeScale_c;
+				Time.fixedDeltaTime = 0.02f * bulletTimeScale_c;
 			}
 		}
 		//Keyboard movement
