@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine.UI;
+using InControl;
 
 [RequireComponent(typeof(Rigidbody))]
 public class Character : MonoBehaviour, DamageableObject {
@@ -18,12 +19,15 @@ public class Character : MonoBehaviour, DamageableObject {
 	float decelerationRate = 0.15f;			//(0-1) How quickly a player returns to rest after releasing movement buttons
 
 	public Rigidbody thisRigidbody;			//Reference to the attached Rigidbody
-	Collider thisCollider;					//Reference to the attached Collider
+	Collider thisCollider;                  //Reference to the attached Collider
+
+	public InputDevice curDevice;
 
 	// Use this for initialization
 	void Start () {
 		thisRigidbody = GetComponent<Rigidbody>();
 		thisCollider = GetComponent<Collider>();
+		curDevice = InputManager.ActiveDevice;
 
 		//Debug characteristics and stats:
 		abilities.Add(this.gameObject.AddComponent<Dash>());
@@ -35,6 +39,7 @@ public class Character : MonoBehaviour, DamageableObject {
 	
 	// Update is called once per frame
 	void Update () {
+
 		CharacterMovement();
 
 		CharacterAttack();
@@ -68,6 +73,14 @@ public class Character : MonoBehaviour, DamageableObject {
 			movespeed--;
 		/*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
+		if (curDevice.LeftStick.Vector.magnitude != 0) {
+			Move(curDevice.LeftStick.Vector);
+		}
+		if (curDevice.RightStick.Vector.magnitude != 0) {
+			Turn(curDevice.RightStick.Vector);
+		}
+
+		/*
 		//Movement up
 		if (Input.GetKey(KeyCode.UpArrow)) {
 			Move(Vector3.forward);
@@ -85,7 +98,7 @@ public class Character : MonoBehaviour, DamageableObject {
 		else if (Input.GetKey(KeyCode.LeftArrow)) {
 			Move(Vector3.left);
 		}
-
+		*/
 		//If no direction is being pressed, decelerate the player
 		if (!Input.GetKey(KeyCode.UpArrow) && !Input.GetKey(KeyCode.DownArrow) &&
 			!Input.GetKey(KeyCode.RightArrow) && !Input.GetKey(KeyCode.LeftArrow)) {
@@ -98,6 +111,9 @@ public class Character : MonoBehaviour, DamageableObject {
 		}
 	}
 	
+	void Move(Vector2 direction) {
+		Move(new Vector3(direction.x, 0, direction.y));
+	}
 	void Move(Vector3 direction) {
 		thisRigidbody.AddForce(direction * acceleration, ForceMode.Acceleration);
 		//thisRigidbody.AddForce(new Vector3(0, 0, acceleration), ForceMode.Acceleration);
@@ -106,6 +122,13 @@ public class Character : MonoBehaviour, DamageableObject {
 		//	cur_vel.z = movespeed;
 		//	thisRigidbody.velocity = cur_vel;
 		//}
+	}
+
+	void Turn(Vector2 facingDirection) {
+		Turn(new Vector3(facingDirection.x, 0, facingDirection.y));
+	}
+	void Turn(Vector3 facingDirection) {
+		transform.forward = facingDirection;
 	}
 
 	public void TakeDamage(float damageIn) {
