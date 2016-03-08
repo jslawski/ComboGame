@@ -6,6 +6,10 @@ using InControl;
 
 [RequireComponent(typeof(Rigidbody))]
 public class Character : MonoBehaviour, DamageableObject {
+	float bullet_time_scale_c = 0.05f;
+
+	public InputDevice curDevice;
+	
 	public List<Ability> abilities;
 
 	public float maxHealth;					//The player's maximum health/combo amount
@@ -24,8 +28,6 @@ public class Character : MonoBehaviour, DamageableObject {
 	float turnSpeed = 0.4f;                 //(0-1) How quickly the player reaches the desired direction to face
 
 	bool controlsDisabled = false;
-
-	public InputDevice curDevice;
 
 	// Use this for initialization
 	void Start () {
@@ -92,18 +94,26 @@ public class Character : MonoBehaviour, DamageableObject {
 		if (Input.GetKeyDown(KeyCode.PageDown))
 			movespeed--;
 		/*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
-
+		
 		//Controller movement
 		if (curDevice != null) {
 			if (curDevice.LeftStick.Vector.magnitude != 0) {
-				Move(curDevice.LeftStick.Vector);
+				Move(curDevice.LeftStick.Vector/Time.timeScale);
 			}
 			else {
 				//If no direction is being pressed, decelerate the player
 				thisRigidbody.velocity = Vector3.Lerp(thisRigidbody.velocity, Vector3.zero, decelerationRate);
 			}
 			if (curDevice.RightStick.Vector.magnitude != 0) {
-				Turn(curDevice.RightStick.Vector);
+				Turn(curDevice.RightStick.Vector/Time.timeScale);
+			}
+			if (curDevice.Action1) {
+				Time.timeScale = bullet_time_scale_c;
+				Time.fixedDeltaTime = 0.02f * bullet_time_scale_c;
+			}
+			else {
+				Time.timeScale = 1;
+				Time.fixedDeltaTime = 0.02f;
 			}
 		}
 		//Keyboard movement
@@ -116,7 +126,6 @@ public class Character : MonoBehaviour, DamageableObject {
 			else if (Input.GetKey(KeyCode.S)) {
 				Move(Vector3.back);
 			}
-
 			//Movement right
 			if (Input.GetKey(KeyCode.D)) {
 				Move(Vector3.right);
@@ -147,7 +156,12 @@ public class Character : MonoBehaviour, DamageableObject {
 			}
 		}
 
-
+		//If no direction is being pressed, decelerate the player
+		/*if (!Input.GetKey(KeyCode.UpArrow) && !Input.GetKey(KeyCode.DownArrow) &&
+			!Input.GetKey(KeyCode.RightArrow) && !Input.GetKey(KeyCode.LeftArrow)) {
+			thisRigidbody.velocity = Vector3.Lerp(thisRigidbody.velocity, Vector3.zero, decelerationRate);
+		}
+		*/
 		//Limit the player's movement speed to the maximum movespeed
 		if (thisRigidbody.velocity.magnitude > movespeed) {
 			thisRigidbody.velocity = thisRigidbody.velocity.normalized * movespeed;
@@ -160,7 +174,7 @@ public class Character : MonoBehaviour, DamageableObject {
 		Move(new Vector3(direction.x, 0, direction.y));
 	}
 	void Move(Vector3 direction) {
-		thisRigidbody.AddForce(direction * acceleration, ForceMode.Acceleration);
+		thisRigidbody.AddForce(((direction / Time.timeScale) * acceleration), ForceMode.Acceleration);
 		//thisRigidbody.AddForce(new Vector3(0, 0, acceleration), ForceMode.Acceleration);
 		//if (thisRigidbody.velocity.z > movespeed) {
 		//	Vector3 cur_vel = thisRigidbody.velocity;
