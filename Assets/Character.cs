@@ -13,12 +13,12 @@ public class Character : MonoBehaviour, DamageableObject {
 	public float timeSinceLastCombo = 0;    //Time since the last time the player added to the combo meter
 	float timeBeforeDecay;					//Time after the last time the player added to the combo meter before health/combo starts to decay
 
-	public float movespeed;				//The player's max speed
-	float acceleration = 150f;			//How quickly a player gets up to max speed
-	float decelerationRate = 0.15f;		//(0-1) How quickly a player returns to rest after releasing movement buttons
+	public float movespeed;					//The player's max speed
+	float acceleration = 150f;				//How quickly a player gets up to max speed
+	float decelerationRate = 0.15f;			//(0-1) How quickly a player returns to rest after releasing movement buttons
 
-	Rigidbody thisRigidbody;			//Reference to the attached Rigidbody
-	Collider thisCollider;              //Reference to the attached Collider
+	public Rigidbody thisRigidbody;			//Reference to the attached Rigidbody
+	Collider thisCollider;					//Reference to the attached Collider
 
 	// Use this for initialization
 	void Start () {
@@ -26,6 +26,7 @@ public class Character : MonoBehaviour, DamageableObject {
 		thisCollider = GetComponent<Collider>();
 
 		//Debug characteristics and stats:
+		abilities.Add(this.gameObject.AddComponent<Dash>());
 		maxHealth = 100;
 		health = maxHealth;
 		healthDecayRate = 0.025f;
