@@ -12,13 +12,13 @@ public class Character : MonoBehaviour, DamageableObject {
 	
 	public List<Ability> abilities;
 
-	public float maxHealth;					//The player's maximum health/combo amount
+	public float maxHealth = 100;			//The player's maximum health/combo amount
 	public float health;					//The player's current health/combo meter
-	public float healthDecayRate;			//The player's rate of health/combo decay over time (health/(second^2))
+	public float healthDecayRate = 0.025f;	//The player's rate of health/combo decay over time (health/(second^2))
 	public float timeSinceLastCombo = 0;    //Time since the last time the player added to the combo meter
-	float timeBeforeDecay;					//Time after the last time the player added to the combo meter before health/combo starts to decay
+	float timeBeforeDecay = 1.5f;			//Time after the last time the player added to the combo meter before health/combo starts to decay
 
-	public float movespeed;					//The player's max speed
+	float movespeed = 5;					//The player's max speed
 	float acceleration = 150f;				//How quickly a player gets up to max speed
 	float decelerationRate = 0.15f;			//(0-1) How quickly a player returns to rest after releasing movement buttons
 
@@ -37,10 +37,7 @@ public class Character : MonoBehaviour, DamageableObject {
 
 		//Debug characteristics and stats:
 		abilities.Add(this.gameObject.AddComponent<Dash>());
-		maxHealth = 100;
 		health = maxHealth;
-		healthDecayRate = 0.025f;
-		timeBeforeDecay = 1.5f;
 	}
 	
 	// Update is called once per frame
@@ -48,7 +45,7 @@ public class Character : MonoBehaviour, DamageableObject {
 		if (curDevice == null) {
 			foreach (var device in InputManager.Devices) {
 				if (device.AnyButton) {
-					print("Button pressed");
+					print("Controller added");
 					curDevice = device;
 				}
 			}
