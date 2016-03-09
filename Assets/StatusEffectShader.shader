@@ -90,8 +90,10 @@
 				//Fourth quadrant
 				else if (_Percent < 1) {
 					rad = rad % (pi / 2);
-					if (!(i.uv.x < 0.5 && i.uv.y > 0.5) ||
-						(i.uv.x < 0.5 && i.uv.y > 0.5) && atan((i.uv.y - 0.5) / (0.5 - i.uv.x)) < rad) {
+					if (i.uv.x < 0.5 && i.uv.y > 0.5 && atan((i.uv.y - 0.5) / (0.5 - i.uv.x)) < rad) {
+						col = grayscale;
+					}
+					else if (!(i.uv.x < 0.5 && i.uv.y > 0.5)) {
 						col = grayscale;
 					}
 				}
