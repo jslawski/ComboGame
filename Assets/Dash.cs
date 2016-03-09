@@ -4,7 +4,9 @@ using System.Collections;
 public class Dash : Ability {
 	float dashTime = 0.1f;
 	float dashDistance = 4f;
-	float dashSpeed;			//Calculated from the other two variables
+	float dashSpeed;            //Calculated from the other two variables
+
+	float dashAssistedSpacing = 1.5f;		//How far from an enemy the player is placed if it locked on while dashing
 
 	// Use this for initialization
 	protected override void Start () {
@@ -28,7 +30,7 @@ public class Dash : Ability {
 		Transform homingTarget;
 		Vector3 homingDir = HomingDirection(out homingTarget);
 		Vector3 direction = (homingDir != Vector3.zero) ? homingDir : thisPlayer.transform.forward;
-		float thisDashTime = (homingDir != Vector3.zero) ? ((homingTarget.position - thisPlayer.transform.position).magnitude - 1f)/dashSpeed : dashTime;
+		float thisDashTime = (homingDir != Vector3.zero) ? ((homingTarget.position - thisPlayer.transform.position).magnitude - dashAssistedSpacing)/dashSpeed : dashTime;
 
 		float timeElapsed = 0;
 		while (timeElapsed < thisDashTime) {
