@@ -12,11 +12,11 @@ public class Character : MonoBehaviour, DamageableObject {
 	
 	public List<Ability> abilities;
 
-	public float maxHealth = 100;			//The player's maximum health/combo amount
-	public float health;					//The player's current health/combo meter
-	public float healthDecayRate = 0.025f;	//The player's rate of health/combo decay over time (health/(second^2))
-	public float timeSinceLastCombo = 0;    //Time since the last time the player added to the combo meter
-	float timeBeforeDecay = 1.5f;			//Time after the last time the player added to the combo meter before health/combo starts to decay
+	public float playerMaxHealth = 100;			//The player's maximum health/combo amount
+	public float playerHealth;					//The player's current health/combo meter
+	public float healthDecayRate = 0.025f;		//The player's rate of health/combo decay over time (health/(second^2))
+	public float timeSinceLastCombo = 0;		//Time since the last time the player added to the combo meter
+	float timeBeforeDecay = 1.5f;				//Time after the last time the player added to the combo meter before health/combo starts to decay
 
 	public float movespeed;					//The player's max speed
 	float acceleration = 150f;				//How quickly a player gets up to max speed
@@ -28,6 +28,17 @@ public class Character : MonoBehaviour, DamageableObject {
 	float turnSpeed = 0.4f;                 //(0-1) How quickly the player reaches the desired direction to face
 
 	bool controlsDisabled = false;
+
+	/*~~~~~~~~~~Properties~~~~~~~~~~*/
+	public float maxHealth {
+		get { return playerMaxHealth; }
+		set { playerMaxHealth = value; }
+	}
+
+	public float health {
+		get { return playerHealth; }
+		set { playerHealth = value; }
+	}
 
 	// Use this for initialization
 	void Start () {
