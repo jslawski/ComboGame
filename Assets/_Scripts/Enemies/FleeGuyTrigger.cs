@@ -51,7 +51,7 @@ public class FleeGuyTrigger : MonoBehaviour {
 			//Pan right 150 degrees from starting position to search for a valid position
 			for (float i = startingAngle; i < panningEdgeRight; i += increment) {
 				potentialTarget = new PolarCoordinate(lookRadius, i);
-				Debug.DrawRay(transform.position, potentialTarget.PolarToCartesian(), Color.blue, 10f);
+				//Debug.DrawRay(transform.position, potentialTarget.PolarToCartesian(), Color.blue, 10f);
 				agent.CalculatePath(transform.position + potentialTarget.PolarToCartesian(), potentialPath);
                 if (potentialPath.status == NavMeshPathStatus.PathComplete) {
 					return;
@@ -60,9 +60,9 @@ public class FleeGuyTrigger : MonoBehaviour {
 		}
 		else {
 			//Pan left 150 degrees froms starting position to search for a valid position
-			for (float i = startingAngle; i > panningEdgeLeft; i += increment) {
+			for (float i = startingAngle; i > panningEdgeLeft; i -= increment) {
 				potentialTarget = new PolarCoordinate(lookRadius, i);
-				Debug.DrawRay(transform.position, potentialTarget.PolarToCartesian(), Color.blue, 10f);
+				//Debug.DrawRay(transform.position, potentialTarget.PolarToCartesian(), Color.blue, 10f);
 				agent.CalculatePath(transform.position + potentialTarget.PolarToCartesian(), potentialPath);
                 if (potentialPath.status == NavMeshPathStatus.PathComplete) {
 					return;
