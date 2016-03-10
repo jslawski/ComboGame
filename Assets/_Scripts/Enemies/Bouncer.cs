@@ -6,11 +6,12 @@ public class Bouncer : Enemy {
 	Rigidbody thisRigidbody;
 	float moveSpeed = 5;
 	float acceleration = 500f;
-	Vector3 direction = new Vector3(1, 0, 1);
+	Vector3 direction;
 
 	// Use this for initialization
 	void Start () {
 		thisRigidbody = GetComponent<Rigidbody>();
+		direction = new Vector3(Random.Range(0, 1f), 0, Random.Range(0, 1f)).normalized;
 		
 	}
 	
