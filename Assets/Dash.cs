@@ -35,7 +35,7 @@ public class Dash : Ability {
 		float timeElapsed = 0;
 		while (timeElapsed < thisDashTime) {
 			timeElapsed += Time.deltaTime;
-			float percent = timeElapsed / dashTime;
+			//float percent = timeElapsed / dashTime;
 
 			thisPlayer.thisRigidbody.velocity = (direction * dashSpeed);
 

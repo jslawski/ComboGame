@@ -214,7 +214,7 @@ public class Character : MonoBehaviour, DamageableObject {
 		controlsDisabled = false;
 	}
 
-	public void TakeDamage(float damageIn) {
+	public void TakeDamage(float damageIn, Vector3 knockback) {
 		print("<color=red>TakeDamage() not implemented yet.</color>");
 	}
 }
