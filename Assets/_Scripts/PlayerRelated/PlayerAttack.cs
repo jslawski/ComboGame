@@ -7,7 +7,7 @@ public class PlayerAttack : MonoBehaviour {
 
 	int consecutiveAttacksPerformed = 0;							//Which attack the player is on
 	float consecutiveAttackTimingWindow = 0.5f;						//How long after an attack the player has to perform a followup attack
-	float internalAttackCooldown = 0.1f;							//Minimum time between attacks
+	float internalAttackCooldown = 0.05f;							//Minimum time between attacks
 
 	float baseDamage = 20f;											//Base damage of the attacks
 	float[] attackMultipliers = {1f, 1.75f, 3.5f};					//Base damage multiplier on each attack
@@ -53,7 +53,7 @@ public class PlayerAttack : MonoBehaviour {
 
 			float attackTime = attackTimes[consecutiveAttacksPerformed];
 
-			thisPlayer.DisableControls(attackTime);
+			//thisPlayer.DisableControls(attackTime);
 
 			//Perform attack
 			float elapsedAttackTime = 0;
@@ -106,6 +106,9 @@ public class PlayerAttack : MonoBehaviour {
 
 		float attackTime = attackTimes[consecutiveAttacksPerformed];
 		Vector3 knockbackForce = thisPlayer.transform.forward * attackMovement[consecutiveAttacksPerformed] / attackTime;
-        hitObj.TakeDamage(baseDamage * attackMultipliers[consecutiveAttacksPerformed], knockbackForce);
+		float damageDone = baseDamage * attackMultipliers[consecutiveAttacksPerformed];
+        hitObj.TakeDamage(baseDamage, knockbackForce);
+
+		thisPlayer.health += damageDone/10f;
 	}
 }

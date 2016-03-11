@@ -12,11 +12,11 @@ public class Character : MonoBehaviour, DamageableObject {
 	
 	public List<Ability> abilities;
 
-	public float playerMaxHealth = 100;			//The player's maximum health/combo amount
-	public float playerHealth;					//The player's current health/combo meter
-	public float healthDecayRate = 0.025f;		//The player's rate of health/combo decay over time (health/(second^2))
-	public float timeSinceLastCombo = 0;		//Time since the last time the player added to the combo meter
-	float timeBeforeDecay = 1.5f;				//Time after the last time the player added to the combo meter before health/combo starts to decay
+	public float playerMaxHealth;				//The player's maximum health/combo amount
+	public float playerHealth;                  //The player's current health/combo meter
+	public float healthDecayRate;				//The player's rate of health/combo decay over time (health/second)
+	public float timeSinceLastCombo = 0;        //Time since the last time the player added to the combo meter
+	float timeBeforeDecay;						//Time after the last time the player added to the combo meter before health/combo starts to decay
 
 	public float movespeed;					//The player's max speed
 	float acceleration = 150f;				//How quickly a player gets up to max speed
@@ -41,7 +41,23 @@ public class Character : MonoBehaviour, DamageableObject {
 
 	public float health {
 		get { return playerHealth; }
-		set { playerHealth = value; }
+		set {
+			//If our health went up, reset the decay timer
+			if (value > playerHealth) {
+				timeSinceLastCombo = 0;
+				//If this would put us above our max health, put us at our max health instead
+				if (value > playerMaxHealth) {
+					playerHealth = playerMaxHealth;
+					return;
+				}
+			}
+			//Bottom out at 0 health
+			else if (value < 0) {
+				playerHealth = 0;
+				return;
+			}
+			playerHealth = value;
+		}
 	}
 
 	public int experience {
@@ -67,8 +83,8 @@ public class Character : MonoBehaviour, DamageableObject {
 		abilities.Add(this.gameObject.AddComponent<Dash>());
 		maxHealth = 100;
 		health = maxHealth;
-		healthDecayRate = 0.025f;
-		timeBeforeDecay = 1.5f;
+		healthDecayRate = 0.0625f;
+		timeBeforeDecay = 1f;
 	}
 	
 	// Update is called once per frame
@@ -86,30 +102,14 @@ public class Character : MonoBehaviour, DamageableObject {
 		timeSinceLastCombo += Time.deltaTime;
 		float timeInDecay = timeSinceLastCombo - timeBeforeDecay;
 		if (timeInDecay > 0 && health > 0) {
-			health -= timeInDecay * timeInDecay * healthDecayRate;
-
-			//Bottom out at 0 health
-			if (health < 0) {
-				health = 0;
-			}
+			health -= timeInDecay * healthDecayRate;
 		}
+
+		//TODO: Don't do GetComponent calls on Update()
 		GetComponent<MeshRenderer>().material.SetFloat("_Percent", 1 - health / maxHealth);
 		GetComponentInChildren<TextMesh>().text = ((int)(health)).ToString();
 
 		CharacterMovement();
-
-		CharacterAttack();
-
-	}
-
-	void CharacterAttack() {
-		if (controlsDisabled) {
-			return;
-		}
-
-		if (curDevice != null && curDevice.Action1.WasPressed) {
-			timeSinceLastCombo = 0;
-		}
 	}
 
 	void CharacterMovement() {
@@ -207,12 +207,6 @@ public class Character : MonoBehaviour, DamageableObject {
 	}
 	void Move(Vector3 direction) {
 		thisRigidbody.AddForce(((direction / Time.timeScale) * acceleration), ForceMode.Acceleration);
-		//thisRigidbody.AddForce(new Vector3(0, 0, acceleration), ForceMode.Acceleration);
-		//if (thisRigidbody.velocity.z > movespeed) {
-		//	Vector3 cur_vel = thisRigidbody.velocity;
-		//	cur_vel.z = movespeed;
-		//	thisRigidbody.velocity = cur_vel;
-		//}
 	}
 
 	void OnTriggerEnter(Collider other) {
