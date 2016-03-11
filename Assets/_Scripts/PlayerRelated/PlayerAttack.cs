@@ -16,7 +16,7 @@ public class PlayerAttack : MonoBehaviour {
 	float[] attackRotations = {90f, 120f, 360f};					//Total degrees the weapon turns during each attack
 	Vector3[] attackAxes = {Vector3.up, Vector3.down, Vector3.up};  //Axis of rotation for each attack
 	float[] attackTimes = {0.15f, 0.25f, 0.5f};                     //Time it takes to perform each attack
-	float[] attackMovement = {0.05f, 0.12f, 0.2f};					//Force forward the player steps with each attack
+	float[] attackMovement = {0.5f, 1.2f, 2f};					//Force forward the player steps with each attack
 
 	bool inAttackCoroutine = false;
 
@@ -42,13 +42,13 @@ public class PlayerAttack : MonoBehaviour {
 		inAttackCoroutine = true;
 
 		while (consecutiveAttacksPerformed < 3) {
-			print("Swing " + (consecutiveAttacksPerformed+1));
+			//print("Swing " + (consecutiveAttacksPerformed+1));
 
 			//Calculate attack parameters
 			Vector3 startEulerRot = attackAxes[consecutiveAttacksPerformed] * startAttackRotations[consecutiveAttacksPerformed];
 			Vector3 endEulerRot = startEulerRot + attackAxes[consecutiveAttacksPerformed] * attackRotations[consecutiveAttacksPerformed];
 
-			print(startEulerRot + "\t" + endEulerRot);
+			//print(startEulerRot + "\t" + endEulerRot);
 			transform.localRotation = Quaternion.Euler(startEulerRot);
 
 			float attackTime = attackTimes[consecutiveAttacksPerformed];
@@ -57,13 +57,13 @@ public class PlayerAttack : MonoBehaviour {
 
 			//Perform attack
 			float elapsedAttackTime = 0;
+			thisPlayer.thisRigidbody.AddForce(thisPlayer.transform.forward * attackMovement[consecutiveAttacksPerformed] / attackTime, ForceMode.Impulse);
 			GetComponentInChildren<BoxCollider>().enabled = true;
 			while (elapsedAttackTime < attackTime) {
 				elapsedAttackTime += Time.deltaTime;
 				float percent = elapsedAttackTime / attackTime;
 
 				transform.localRotation = Quaternion.Euler(Vector3.Lerp(startEulerRot, endEulerRot, percent));
-				thisPlayer.thisRigidbody.AddForce(thisPlayer.transform.forward * attackMovement[consecutiveAttacksPerformed]/attackTime, ForceMode.VelocityChange);
 
 				yield return null;
 			}
@@ -104,7 +104,8 @@ public class PlayerAttack : MonoBehaviour {
 			return;
 		}
 
-		Vector3 knockbackForce = Vector3.forward * 15; //Fuck if i know
+		float attackTime = attackTimes[consecutiveAttacksPerformed];
+		Vector3 knockbackForce = thisPlayer.transform.forward * attackMovement[consecutiveAttacksPerformed] / attackTime;
         hitObj.TakeDamage(baseDamage * attackMultipliers[consecutiveAttacksPerformed], knockbackForce);
 	}
 }

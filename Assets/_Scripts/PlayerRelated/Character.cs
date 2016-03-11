@@ -20,7 +20,11 @@ public class Character : MonoBehaviour, DamageableObject {
 
 	public float movespeed;					//The player's max speed
 	float acceleration = 150f;				//How quickly a player gets up to max speed
-	float decelerationRate = 0.15f;			//(0-1) How quickly a player returns to rest after releasing movement buttons
+	float decelerationRate = 0.15f;         //(0-1) How quickly a player returns to rest after releasing movement buttons
+
+	int playerLevel = 1;					//Player levels up when playerExperience >= expForNextLevel
+	int expForNextLevel = 100;           //Increases every time the player levels up
+	int playerExperience = 0;			//Decreases to ~0 whenever player levels up
 
 	public Rigidbody thisRigidbody;			//Reference to the attached Rigidbody
 	Collider thisCollider;                  //Reference to the attached Collider
@@ -38,6 +42,19 @@ public class Character : MonoBehaviour, DamageableObject {
 	public float health {
 		get { return playerHealth; }
 		set { playerHealth = value; }
+	}
+
+	public int experience {
+		get { return playerExperience; }
+		set {
+			playerExperience = value;
+			if (playerExperience > expForNextLevel) {
+				playerExperience -= expForNextLevel;
+				playerLevel++;
+				expForNextLevel = GetExpNeededForNextLevel();
+				print("PLAYER LEVELED UP TO LEVEL " + playerLevel + "!\nExperience needed to level up to Level " + (playerLevel+1) + ": " + expForNextLevel);
+			}
+		}
 	}
 
 	// Use this for initialization
@@ -196,6 +213,18 @@ public class Character : MonoBehaviour, DamageableObject {
 		//	cur_vel.z = movespeed;
 		//	thisRigidbody.velocity = cur_vel;
 		//}
+	}
+
+	void OnTriggerEnter(Collider other) {
+		//Gain experience
+		if (other.gameObject.CompareTag("Experience")) {
+			experience++;
+			Destroy(other.gameObject);
+		}
+	}
+
+	int GetExpNeededForNextLevel() {
+		return 10 * (playerLevel - 1) * (playerLevel - 1) + 100;
 	}
 
 	void Turn(Vector2 facingDirection) {

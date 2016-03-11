@@ -4,6 +4,9 @@ using System.Collections;
 [RequireComponent(typeof(Rigidbody))]
 public class Enemy : MonoBehaviour, DamageableObject {
 	Rigidbody thisRigidbody;
+
+	int experienceOnDeath;
+
 	float enemyMaxHealth;
 	float enemyHealth;
 
@@ -21,6 +24,11 @@ public class Enemy : MonoBehaviour, DamageableObject {
 	// Use this for initialization
 	void Start () {
 		thisRigidbody = GetComponent<Rigidbody>();
+
+		//Debug stats
+		experienceOnDeath = 10;
+		enemyMaxHealth = 100f;
+		enemyHealth = enemyMaxHealth;
 	}
 	
 	// Update is called once per frame
@@ -31,7 +39,19 @@ public class Enemy : MonoBehaviour, DamageableObject {
 	public void TakeDamage(float damageIn, Vector3 knockback) {
 		enemyHealth -= damageIn;
 
-		thisRigidbody.AddForce(knockback, ForceMode.Impulse);
-		print("Took " + damageIn + " damage with " + knockback + " knockback.");
+		if (enemyHealth <= 0) {
+			Die();
+			return;
+		}
+
+		thisRigidbody.AddForce(knockback, ForceMode.VelocityChange);
+		//print("Took " + damageIn + " damage with " + knockback + " knockback.");
+	}
+
+	void Die() {
+		print("Alas, I have been slain.");
+
+		GameManager.S.DropExperienceAtLocation(transform.position, experienceOnDeath);
+		Destroy(this.gameObject);
 	}
 }
