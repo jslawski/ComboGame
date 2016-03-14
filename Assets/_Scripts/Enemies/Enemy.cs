@@ -22,7 +22,7 @@ public class Enemy : MonoBehaviour, DamageableObject {
 	}
 
 	// Use this for initialization
-	void Start () {
+	virtual protected void Start () {
 		thisRigidbody = GetComponent<Rigidbody>();
 
 		//Debug stats

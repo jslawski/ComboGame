@@ -3,25 +3,26 @@ using System.Collections;
 
 public class Bouncer : Enemy {
 
-	Rigidbody thisRigidbody;
+	Rigidbody bouncerRigidbody;
 	float moveSpeed = 5;
 	float acceleration = 500f;
 	Vector3 direction;
 
 	// Use this for initialization
-	void Start () {
-		thisRigidbody = GetComponent<Rigidbody>();
+	protected override void Start () {
+		base.Start();
+		bouncerRigidbody = GetComponent<Rigidbody>();
 		direction = new Vector3(Random.Range(0, 1f), 0, Random.Range(0, 1f)).normalized;
 		
 	}
 	
 	// Update is called once per frame
 	void Update () {
-		thisRigidbody.AddForce(direction*moveSpeed, ForceMode.Acceleration);
+		bouncerRigidbody.AddForce(direction*moveSpeed, ForceMode.Acceleration);
 
 		//Limit bouncer's maximum movespeed
-		if (thisRigidbody.velocity.magnitude > moveSpeed) {
-			thisRigidbody.velocity = thisRigidbody.velocity.normalized * moveSpeed;
+		if (bouncerRigidbody.velocity.magnitude > moveSpeed) {
+			bouncerRigidbody.velocity = bouncerRigidbody.velocity.normalized * moveSpeed;
 		}
 	}
 
@@ -40,6 +41,6 @@ public class Bouncer : Enemy {
 			direction = new Vector3(-direction.x, direction.y, direction.z);	
 		}
 		//Bounce the bouncer off the wall, so it maintains its speed
-		thisRigidbody.AddForce(direction * moveSpeed, ForceMode.Impulse);
+		bouncerRigidbody.AddForce(direction * moveSpeed, ForceMode.Impulse);
 	}
 }
