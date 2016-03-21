@@ -15,7 +15,10 @@ public class Maze : MonoBehaviour {
 	public float doorProbability;							//Probability of a door appearing instead of a passage
 
 	private MazeCell[,] cells;								//All cells within the maze
-	private List<MazeRoom> rooms = new List<MazeRoom>();	//List of rooms within the maze
+	private List<MazeRoom> rooms = new List<MazeRoom>();    //List of rooms within the maze
+
+	public int minRoomSize;									//Minimum number of cells a room must be
+	public int maxRoomSize;									//Maximum number of cells a room can be
 
 	//Return a random coordinates inside the maze
 	public IntVector2 RandomCoordinates {
@@ -122,6 +125,16 @@ public class Maze : MonoBehaviour {
 		//Determine whether or not the passage is a door to another room, or a simple passage
 		MazePassage prefab = Random.value < doorProbability ? doorPrefab : passagePrefab;
 
+		//Don't create a new room if the current room is too small
+		if (cell.room.cells.Count < minRoomSize) {
+			prefab = passagePrefab;
+		}
+
+		//Force create a new room if the current room is becoming too big
+		if (cell.room.cells.Count >= maxRoomSize - 1) {
+			prefab = doorPrefab;
+		}
+
 		//Instantiate passage for first cell
 		MazePassage passage = Instantiate(prefab) as MazePassage;
 		passage.Initialize(cell, otherCell, direction);
@@ -167,8 +180,6 @@ public class Maze : MonoBehaviour {
 
 		//Set the cell's size
 		newCell.size = new Vector2(newCell.transform.GetChild(0).transform.localScale.x, newCell.transform.GetChild(0).transform.localScale.y);
-
-		print(newCell.size);
 
 		//Name the cell something useful to view in the heirarchy
 		newCell.name = "Maze Cell " + coordinates.x + ", " + coordinates.z;

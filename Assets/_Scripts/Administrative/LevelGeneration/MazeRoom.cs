@@ -8,7 +8,7 @@ public class MazeRoom : ScriptableObject {
 
 	public MazeRoomSettings settings;						//Settings of the room (currently just floor color)
 
-	private List<MazeCell> cells = new List<MazeCell>();	//Cells contained within this room
+	public List<MazeCell> cells = new List<MazeCell>();		//Cells contained within this room
 
 	//Add a cell to this room
 	public void Add(MazeCell cell) {
