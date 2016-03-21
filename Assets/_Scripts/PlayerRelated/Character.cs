@@ -10,7 +10,7 @@ public class Character : MonoBehaviour, DamageableObject {
 
 	public InputDevice curDevice;
 	
-	public List<Ability> abilities;
+	public List<ActivatedAbility> activatedAbilities;
 
 	public float playerMaxHealth;				//The player's maximum health/combo amount
 	public float playerHealth;                  //The player's current health/combo meter
@@ -19,19 +19,22 @@ public class Character : MonoBehaviour, DamageableObject {
 	float timeBeforeDecay;						//Time after the last time the player added to the combo meter before health/combo starts to decay
 
 	public float movespeed;					//The player's max speed
-	float acceleration = 150f;				//How quickly a player gets up to max speed
+	float acceleration = 50f;				//How quickly a player gets up to max speed
 	float decelerationRate = 0.15f;         //(0-1) How quickly a player returns to rest after releasing movement buttons
 
 	int playerLevel = 1;					//Player levels up when playerExperience >= expForNextLevel
-	int expForNextLevel = 100;           //Increases every time the player levels up
-	int playerExperience = 0;			//Decreases to ~0 whenever player levels up
+	int expForNextLevel = 100;				//Increases every time the player levels up
+	int playerExperience = 0;				//Decreases to ~0 whenever player levels up
 
 	public Rigidbody thisRigidbody;			//Reference to the attached Rigidbody
 	Collider thisCollider;                  //Reference to the attached Collider
 	Vector3 targetForward;					//Which direction the player should attempt to be facing
 	float turnSpeed = 0.4f;                 //(0-1) How quickly the player reaches the desired direction to face
 
+	public ExperienceBar expBar;
+
 	bool controlsDisabled = false;
+	public bool invincible = false;
 
 	/*~~~~~~~~~~Properties~~~~~~~~~~*/
 	public float maxHealth {
@@ -70,17 +73,18 @@ public class Character : MonoBehaviour, DamageableObject {
 				expForNextLevel = GetExpNeededForNextLevel();
 				print("PLAYER LEVELED UP TO LEVEL " + playerLevel + "!\nExperience needed to level up to Level " + (playerLevel+1) + ": " + expForNextLevel);
 			}
+			expBar.targetPercent = (float)playerExperience / (float)expForNextLevel;
 		}
 	}
 
 	// Use this for initialization
-	void Start () {
+	void Awake () {
 		thisRigidbody = GetComponent<Rigidbody>();
 		thisCollider = GetComponent<Collider>();
 		curDevice = (InputManager.ActiveDevice.Name == "NullInputDevice") ? null : InputManager.ActiveDevice;
 
 		//Debug characteristics and stats:
-		abilities.Add(this.gameObject.AddComponent<Dash>());
+		activatedAbilities.Add(this.gameObject.AddComponent<Dash>());
 		maxHealth = 100;
 		health = maxHealth;
 		healthDecayRate = 0.0625f;
@@ -138,6 +142,8 @@ public class Character : MonoBehaviour, DamageableObject {
 				//If no direction is being pressed, decelerate the player
 				thisRigidbody.velocity = Vector3.Lerp(thisRigidbody.velocity, Vector3.zero, decelerationRate);
 			}
+
+			//Turning the player
 			if (curDevice.RightStick.Vector.magnitude != 0) {
 				Turn(curDevice.RightStick.Vector/Time.timeScale);
 			}
@@ -168,10 +174,10 @@ public class Character : MonoBehaviour, DamageableObject {
 			}
 
 			//If no direction is being pressed, decelerate the player
-			if (!Input.GetKey(KeyCode.UpArrow) && !Input.GetKey(KeyCode.DownArrow) &&
-				!Input.GetKey(KeyCode.RightArrow) && !Input.GetKey(KeyCode.LeftArrow)) {
-				thisRigidbody.velocity = Vector3.Lerp(thisRigidbody.velocity, Vector3.zero, decelerationRate);
-			}
+			//if (!Input.GetKey(KeyCode.UpArrow) && !Input.GetKey(KeyCode.DownArrow) &&
+			//	!Input.GetKey(KeyCode.RightArrow) && !Input.GetKey(KeyCode.LeftArrow)) {
+			//	thisRigidbody.velocity = Vector3.Lerp(thisRigidbody.velocity, Vector3.zero, decelerationRate);
+			//}
 
 			//Turning
 			if (Input.GetKey(KeyCode.UpArrow)) {
@@ -194,10 +200,9 @@ public class Character : MonoBehaviour, DamageableObject {
 			thisRigidbody.velocity = Vector3.Lerp(thisRigidbody.velocity, Vector3.zero, decelerationRate);
 		}
 		*/
-		//Limit the player's movement speed to the maximum movespeed
-		if (thisRigidbody.velocity.magnitude > movespeed) {
-			thisRigidbody.velocity = thisRigidbody.velocity.normalized * movespeed;
-		}
+		//Limit the player's movement speed to the maximum movespeed by adding increasing amounts of drag
+		thisRigidbody.drag = (10 / movespeed) * (thisRigidbody.velocity.magnitude / movespeed);//Mathf.InverseLerp(0, movespeed, thisRigidbody.velocity.magnitude);
+
 		//Lerp the player's forward vector to the desired forward vector
 		transform.forward = Vector3.Lerp(transform.forward, targetForward, turnSpeed);
 	}
@@ -238,6 +243,10 @@ public class Character : MonoBehaviour, DamageableObject {
 	}
 
 	public void TakeDamage(float damageIn, Vector3 knockback) {
+		if (invincible) {
+			print("I scoff at your puny attempts to damage me! (Player is invulnerable)");
+			return;
+		}
 		print("<color=red>TakeDamage() not implemented yet.</color>");
 	}
 }

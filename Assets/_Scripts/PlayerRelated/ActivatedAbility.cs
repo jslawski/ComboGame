@@ -2,7 +2,8 @@
 using System.Collections;
 using InControl;
 
-public class Ability : MonoBehaviour {
+public abstract class ActivatedAbility : MonoBehaviour {
+	public AbilityInfo info;
 	public Character thisPlayer;			//The player who has this ability
 	public KeyCode activateKey;             //Keyboard key used to activate the ability
 	public InputControl activateButton;		//Controller button used to activate the ability
@@ -13,10 +14,14 @@ public class Ability : MonoBehaviour {
 	public float cooldownRemaining = 0;		//Time remaining on the cooldown
 
 	// Use this for initialization
-	protected virtual void Start () {
-		print("Ability.Start()");
+	protected virtual void Awake () {
 		thisPlayer = gameObject.GetComponent<Character>();
+
+		info = new AbilityInfo();
+		SetAbilityInfo();
 	}
+
+	protected abstract void SetAbilityInfo();
 	
 	// Update is called once per frame
 	protected virtual void Update () {
@@ -30,7 +35,7 @@ public class Ability : MonoBehaviour {
 	}
 
 	public virtual void Activate() {
-		print("Ability activated");
+		print(this.GetType().ToString() + " activated");
 		cooldownRemaining = cooldown;
 	}
 }

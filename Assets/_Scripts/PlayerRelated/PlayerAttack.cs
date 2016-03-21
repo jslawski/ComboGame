@@ -16,7 +16,7 @@ public class PlayerAttack : MonoBehaviour {
 	float[] attackRotations = {90f, 120f, 360f};					//Total degrees the weapon turns during each attack
 	Vector3[] attackAxes = {Vector3.up, Vector3.down, Vector3.up};  //Axis of rotation for each attack
 	float[] attackTimes = {0.15f, 0.25f, 0.5f};                     //Time it takes to perform each attack
-	float[] attackMovement = {0.5f, 1.2f, 2f};					//Force forward the player steps with each attack
+	float[] attackMovement = {0.5f, 1.2f, 2f};						//Force forward the player steps with each attack
 
 	bool inAttackCoroutine = false;
 

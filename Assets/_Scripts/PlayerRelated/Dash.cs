@@ -1,22 +1,31 @@
 ﻿using UnityEngine;
 using System.Collections;
+using UnityEngine.UI;
+using System;
 
-public class Dash : Ability {
+public class Dash : ActivatedAbility {
 	float dashTime = 0.1f;
 	float dashDistance = 4f;
-	float dashSpeed;            //Calculated from the other two variables
+	float dashSpeed;						//Calculated from the other two variables
 
 	float dashAssistedSpacing = 1.5f;		//How far from an enemy the player is placed if it locked on while dashing
 
 	// Use this for initialization
-	protected override void Start () {
-		base.Start();
+	protected override void Awake () {
+		base.Awake();
 
 		cooldown = 2f;
-		activateKey = KeyCode.Q;
+		activateKey = KeyCode.Alpha1;
 		activateButton = (thisPlayer.curDevice != null) ? thisPlayer.curDevice.LeftTrigger : null;
 
 		dashSpeed = dashDistance / dashTime;
+	}
+
+	protected override void SetAbilityInfo() {
+		info.abilityName = "Dash";
+		info.abilityDescription = "Player quickly charges forward on a short cooldown.";
+		info.abilityImage = Resources.Load<Sprite>("Images/AbilityImages/Dash.png");
+		info.type = typeof(Dash);
 	}
 
 	public override void Activate() {
