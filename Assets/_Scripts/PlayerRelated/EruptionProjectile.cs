@@ -40,7 +40,7 @@ public class EruptionProjectile : MonoBehaviour {
 		float percent = timeAlive / lifespan;
 		thisMat.SetColor("_TintColor", Color.Lerp(startCol, endCol, percent));
 		curDamage = Mathf.Lerp(maxDamage, minDamage, percent);
-		print(curDamage);
+		//print(curDamage);
 	}
 
 	void OnTriggerStay(Collider other) {
