@@ -22,8 +22,8 @@ public class CameraFollow : MonoBehaviour {
 
 	//DEBUG INPUT FOR CAMERA SHAKE
 	void Update() {
-		if (Input.GetKeyDown("x")) {
-			CameraShake(0.2f, 1);
+		if (Input.GetKey("x")) {
+			CameraShake(0.2f, 2);
 		}
 	}
 	

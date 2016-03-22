@@ -22,7 +22,7 @@ public class EruptionProjectile : MonoBehaviour {
 		thisMat = GetComponent<Renderer>().material;
 		startCol = thisMat.GetColor("_TintColor");
 		endCol = new Color(startCol.r, startCol.g, startCol.b, 0);
-		minDamage = maxDamage / 3f;
+		minDamage = maxDamage / 2.5f;
 	}
 	
 	// Update is called once per frame

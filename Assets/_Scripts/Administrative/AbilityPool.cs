@@ -64,7 +64,6 @@ public class AbilityPool : MonoBehaviour {
 		foreach (var item in abilitiesInPool) {
 			list.Add(item);
 		}
-
 		//Remove random items until we are left with size == count
 		while (abilitiesInPool.Count > count) {
 			int randIndex = UnityEngine.Random.Range(0, abilitiesInPool.Count);

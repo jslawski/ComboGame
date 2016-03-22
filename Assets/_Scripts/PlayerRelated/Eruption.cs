@@ -19,7 +19,7 @@ public class Eruption : ActivatedAbility {
 	protected override void SetAbilityInfo() {
 		info.abilityName = "Eruption";
 		info.abilityDescription = "Releases an expanding wave of fire that damages enemies it passes through.";
-		info.abilityImage = Resources.Load<Sprite>("Images/AbilityImages/Eruption.png");
+		info.abilityImage = Resources.Load<Sprite>("Images/AbilityImages/Eruption");
 		info.type = typeof(Eruption);
 	}
 

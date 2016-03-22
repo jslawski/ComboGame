@@ -14,6 +14,9 @@ public class LevelUpAbilityPanel : MonoBehaviour {
 		abilityDescription = transform.GetChild(2).GetComponent<Text>();
 	}
 
+	public void SetLevelUpAbilityPanel(AbilityInfo info) {
+		SetLevelUpAbilityPanel(info.abilityImage, info.abilityName, info.abilityDescription);
+	}
 	public void SetLevelUpAbilityPanel(Sprite image, string name, string description) {
 		abilityImage.sprite = image;
 		abilityName.text = name;

@@ -24,7 +24,7 @@ public class Dash : ActivatedAbility {
 	protected override void SetAbilityInfo() {
 		info.abilityName = "Dash";
 		info.abilityDescription = "Player quickly charges forward on a short cooldown.";
-		info.abilityImage = Resources.Load<Sprite>("Images/AbilityImages/Dash.png");
+		info.abilityImage = Resources.Load<Sprite>("Images/AbilityImages/Dash");
 		info.type = typeof(Dash);
 	}
 

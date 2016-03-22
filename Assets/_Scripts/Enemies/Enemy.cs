@@ -49,7 +49,7 @@ public class Enemy : MonoBehaviour, DamageableObject {
 	}
 
 	void Die() {
-		print("Alas, I have been slain.");
+		//print("Alas, I have been slain.");
 
 		GameManager.S.DropExperienceAtLocation(transform.position, experienceOnDeath);
 		Destroy(this.gameObject);
