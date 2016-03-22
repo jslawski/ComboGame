@@ -30,6 +30,6 @@ public class DealDamage : MonoBehaviour {
 		float damageDone = baseDamage;
 		hitObj.TakeDamage(baseDamage, new Vector3(0, 0, 0));
 		thisPlayer.health += damageDone / 10f;
-		CameraFollow.S.CameraShake(0.1f, 0.5f);
+		CameraFollow.S.CameraShake(0.1f, 0.75f);
 	}
 }

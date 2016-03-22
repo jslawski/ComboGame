@@ -16,7 +16,7 @@ public class PhaseShift : ActivatedAbility {
 	protected override void SetAbilityInfo() {
 		info.abilityName = "Phase Shift";
 		info.abilityDescription = "Shift dimensions to temporarily pass through obstacles.";
-		info.abilityImage = Resources.Load<Sprite>("Images/AbilityImages/PhaseShift.png");
+		info.abilityImage = Resources.Load<Sprite>("Images/AbilityImages/PhaseShift");
 		info.type = typeof(PhaseShift);
 	}
 
