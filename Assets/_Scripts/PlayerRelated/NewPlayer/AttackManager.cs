@@ -25,6 +25,7 @@ public class AttackManager : MonoBehaviour {
 	Each possible combo has a corresponding coroutine that executes when it is called
 	Punch Punch Punch Punch	
 	Punch Punch Punch Punch Punch
+	Punch Punch Punch Punch Kick
 
 	Kick Kick Kick
 	Kick Kick Kick Kick
@@ -155,6 +156,12 @@ public class AttackManager : MonoBehaviour {
 		ExecuteNextAttack();
 	}
 
+	//SPINNING KICK
+	IEnumerator PunchPunchPunchPunchKick() {
+		StartCoroutine("KickKickKickKick");
+		yield return null;
+	}
+
 	//MASSIVE PUNCH
 	IEnumerator PunchPunchPunchPunchPunch() {
 		int backupFrames = 15;                                          //Number of frames the player spends backing up
@@ -207,12 +214,6 @@ public class AttackManager : MonoBehaviour {
 	}
 
 	IEnumerator PunchPunchPunchKick() {
-		ResetToKick();
-
-		yield return null;
-	}
-
-	IEnumerator PunchPunchPunchPunchKick() {
 		ResetToKick();
 
 		yield return null;
