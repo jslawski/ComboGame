@@ -10,9 +10,10 @@ public class AttackManager : MonoBehaviour {
 	public GameObject[] legs;						//Reference to player's legs
 	public float curComboTime = 0;					//Time left on current combo
 	public float comboTimeReset = 0.5f;				//Time allotted to perform next attack in combo
-	NewCharacter thisPlayer;						//Reference to player
+	Character thisPlayer;							//Reference to player
 	Transform playerTransform;                      //Reference to player transform
-	Attack playerAttack;							//Reference to the Attack script on the player
+	Attack playerAttack;                            //Reference to the Attack script on the player
+	Rigidbody thisRigidbody;
 
 	public Queue<string> attackQueue;       //Queue of the attacks that are to be executed next
 
@@ -38,16 +39,18 @@ public class AttackManager : MonoBehaviour {
 	}
 
 	void Start() {
-		thisPlayer = GetComponent<NewCharacter>();
+		thisPlayer = GetComponent<Character>();
 		playerTransform = GetComponent<Transform>();
 		playerAttack = GetComponent<Attack>();
 		attackQueue = new Queue<string>();
+		thisRigidbody = thisPlayer.gameObject.GetComponent<Rigidbody>();
 	}
 
 	//Execute the next attack in the queue
 	public void ExecuteAttack() {
 		//Execute the correct coroutine and remove it from the queued up attacks
 		StartCoroutine(attackQueue.Peek());
+		thisRigidbody.velocity = new Vector3(0, 0, 0);
 	}
 
 	//Remove the most recently executed attack from the queue, and start executing the next one

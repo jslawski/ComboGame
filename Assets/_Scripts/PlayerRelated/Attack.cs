@@ -3,7 +3,7 @@ using System.Collections;
 
 public class Attack : MonoBehaviour {
 
-	NewCharacter thisPlayer;						//Reference to the player component
+	Character thisPlayer;						//Reference to the player component
 	public AttackNode rootNode;						//Starting node that every combo starts at
 	public AttackNode curNode;                      //Current node in the player's combo that determines the next attack
 
@@ -12,7 +12,7 @@ public class Attack : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-		thisPlayer = GetComponent<NewCharacter>();
+		thisPlayer = GetComponent<Character>();
 
 		rootNode = GetComponent<AttackTree>().mainTree;
 		curNode = rootNode;

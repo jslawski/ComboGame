@@ -18,6 +18,8 @@ public class CameraFollow : MonoBehaviour {
 		S = this;
 		startOffset = transform.position;
 		curOffset = startOffset;
+
+		followObject = GameManager.S.player.gameObject.transform;
 	}
 
 	//DEBUG INPUT FOR CAMERA SHAKE

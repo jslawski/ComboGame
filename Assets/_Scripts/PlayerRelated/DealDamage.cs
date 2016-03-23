@@ -4,11 +4,14 @@ using System.Collections;
 public class DealDamage : MonoBehaviour {
 
 	float baseDamage = 10f;
-	NewCharacter thisPlayer;
+	static public float damageMultiplier = 1f;
+	static public float knockbackScalar = 0f;
+
+	Character thisPlayer;
 
 	// Use this for initialization
 	void Start () {
-		thisPlayer = GetComponentInParent<NewCharacter>();
+		thisPlayer = GetComponentInParent<Character>();
 	}
 	
 	// Update is called once per frame
@@ -26,7 +29,6 @@ public class DealDamage : MonoBehaviour {
 		}
 
 		//Calculate damage, and apply it
-		print("Damaged!");
 		float damageDone = baseDamage;
 		hitObj.TakeDamage(baseDamage, new Vector3(0, 0, 0));
 		thisPlayer.health += damageDone / 10f;

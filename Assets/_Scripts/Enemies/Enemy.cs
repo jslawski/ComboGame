@@ -36,7 +36,7 @@ public class Enemy : MonoBehaviour, DamageableObject {
 		if (thisRigidbody.IsSleeping()) thisRigidbody.WakeUp();
 	}
 
-	public void TakeDamage(float damageIn, Vector3 knockback) {
+	public void TakeDamage(float damageIn, Vector3 knockback, float stunDuration) {
 		enemyHealth -= damageIn;
 
 		if (enemyHealth <= 0) {

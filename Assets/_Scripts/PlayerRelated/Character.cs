@@ -19,7 +19,7 @@ public class Character : MonoBehaviour, DamageableObject {
 	float timeBeforeDecay;						//Time after the last time the player added to the combo meter before health/combo starts to decay
 
 	public float movespeed;					//The player's max speed
-	float acceleration = 50f;				//How quickly a player gets up to max speed
+	float acceleration = 150f;				//How quickly a player gets up to max speed
 	float decelerationRate = 0.15f;         //(0-1) How quickly a player returns to rest after releasing movement buttons
 
 	int playerLevel = 1;					//Player levels up when playerExperience >= expForNextLevel
@@ -28,12 +28,17 @@ public class Character : MonoBehaviour, DamageableObject {
 
 	public Rigidbody thisRigidbody;			//Reference to the attached Rigidbody
 	Collider thisCollider;                  //Reference to the attached Collider
+	MeshRenderer thisMesh;
+	TextMesh thisText;
 	Vector3 targetForward;					//Which direction the player should attempt to be facing
 	float turnSpeed = 0.4f;                 //(0-1) How quickly the player reaches the desired direction to face
 
-	public ExperienceBar expBar;
 
+	public ExperienceBar expBar;
 	bool controlsDisabled = false;
+
+	public bool attacking = false;
+	public bool lockSpinning = false;
 	public bool invincible = false;
 
 	/*~~~~~~~~~~Properties~~~~~~~~~~*/
@@ -83,12 +88,16 @@ public class Character : MonoBehaviour, DamageableObject {
 		thisCollider = GetComponent<Collider>();
 		curDevice = (InputManager.ActiveDevice.Name == "NullInputDevice") ? null : InputManager.ActiveDevice;
 
+		thisMesh = GetComponent<MeshRenderer>();
+		thisText = GetComponentInChildren<TextMesh>();
+
 		//Debug characteristics and stats:
 		activatedAbilities.Add(this.gameObject.AddComponent<Dash>());
 		maxHealth = 100;
 		health = maxHealth;
 		healthDecayRate = 0.0625f;
 		timeBeforeDecay = 1f;
+		movespeed = 3;
 	}
 	
 	// Update is called once per frame
@@ -109,9 +118,8 @@ public class Character : MonoBehaviour, DamageableObject {
 			health -= timeInDecay * healthDecayRate;
 		}
 
-		//TODO: Don't do GetComponent calls on Update()
-		GetComponent<MeshRenderer>().material.SetFloat("_Percent", 1 - health / maxHealth);
-		GetComponentInChildren<TextMesh>().text = ((int)(health)).ToString();
+		thisMesh.material.SetFloat("_Percent", 1 - health / maxHealth);
+		thisText.text = ((int)(health)).ToString();
 
 		CharacterMovement();
 	}
@@ -135,21 +143,24 @@ public class Character : MonoBehaviour, DamageableObject {
 				Time.fixedDeltaTime = 0.02f;
 			}
 
+			//Player turns and moves at the same time
 			if (curDevice.LeftStick.Vector.magnitude != 0) {
-				Move(curDevice.LeftStick.Vector/Time.timeScale);
+				//Allow rotation during attacks, but not movement
+				if (!attacking) {
+					Move(curDevice.LeftStick.Vector / Time.timeScale);
+				}
+				//Lock spinning as well if the player is finishing a combo
+				if (!lockSpinning) {
+					Turn(curDevice.LeftStick.Vector / Time.timeScale);
+				}
 			}
 			else {
 				//If no direction is being pressed, decelerate the player
 				thisRigidbody.velocity = Vector3.Lerp(thisRigidbody.velocity, Vector3.zero, decelerationRate);
 			}
 
-			//Turning the player
-			if (curDevice.RightStick.Vector.magnitude != 0) {
-				Turn(curDevice.RightStick.Vector/Time.timeScale);
-			}
-
 			//Change to bullet-time
-			if (curDevice.Action1) {
+			if (curDevice.Action2) {
 				Time.timeScale = bulletTimeScale_c;
 				Time.fixedDeltaTime = 0.02f * bulletTimeScale_c;
 			}
@@ -173,12 +184,6 @@ public class Character : MonoBehaviour, DamageableObject {
 				Move(Vector3.left);
 			}
 
-			//If no direction is being pressed, decelerate the player
-			//if (!Input.GetKey(KeyCode.UpArrow) && !Input.GetKey(KeyCode.DownArrow) &&
-			//	!Input.GetKey(KeyCode.RightArrow) && !Input.GetKey(KeyCode.LeftArrow)) {
-			//	thisRigidbody.velocity = Vector3.Lerp(thisRigidbody.velocity, Vector3.zero, decelerationRate);
-			//}
-
 			//Turning
 			if (Input.GetKey(KeyCode.UpArrow)) {
 				Turn(Vector3.Lerp(transform.forward, Vector3.forward, 0.3f));
@@ -195,11 +200,10 @@ public class Character : MonoBehaviour, DamageableObject {
 		}
 
 		//If no direction is being pressed, decelerate the player
-		/*if (!Input.GetKey(KeyCode.UpArrow) && !Input.GetKey(KeyCode.DownArrow) &&
-			!Input.GetKey(KeyCode.RightArrow) && !Input.GetKey(KeyCode.LeftArrow)) {
+		if (curDevice.LeftStick.Vector.magnitude <= 0.1f) {
 			thisRigidbody.velocity = Vector3.Lerp(thisRigidbody.velocity, Vector3.zero, decelerationRate);
 		}
-		*/
+		
 		//Limit the player's movement speed to the maximum movespeed by adding increasing amounts of drag
 		thisRigidbody.drag = (10 / movespeed) * (thisRigidbody.velocity.magnitude / movespeed);//Mathf.InverseLerp(0, movespeed, thisRigidbody.velocity.magnitude);
 
@@ -242,7 +246,7 @@ public class Character : MonoBehaviour, DamageableObject {
 		controlsDisabled = false;
 	}
 
-	public void TakeDamage(float damageIn, Vector3 knockback) {
+	public void TakeDamage(float damageIn, Vector3 knockback, float stunDuration) {
 		if (invincible) {
 			print("I scoff at your puny attempts to damage me! (Player is invulnerable)");
 			return;

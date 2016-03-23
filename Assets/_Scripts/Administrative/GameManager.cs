@@ -19,6 +19,8 @@ public class GameManager : MonoBehaviour {
 	// Use this for initialization
 	void Awake () {
 		S = this;
+
+		player = GameObject.FindGameObjectWithTag("Player").GetComponent<Character>();
 		StartCoroutine(GenerateMaze());
 	}
 	
