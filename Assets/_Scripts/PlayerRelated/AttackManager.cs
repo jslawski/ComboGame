@@ -91,12 +91,13 @@ public class AttackManager : MonoBehaviour {
 
 	void FixedUpdate() {
 		if (S.curComboTime > 0) {
-			S.curComboTime -= Time.deltaTime;
+			S.curComboTime -= Time.fixedDeltaTime;
 		}
 		else {
 			thisPlayer.attacking = false;
 			//Reset the combo chain
 			playerAttack.curNode = playerAttack.rootNode;
+			playerAttack.curTarget = null;
 		}
 	}
 
@@ -104,7 +105,21 @@ public class AttackManager : MonoBehaviour {
 	IEnumerator Punch() {
 		fists[0].SetActive(true);
 		curComboTime = comboTimeReset;
-		playerTransform.Translate(playerTransform.forward * attackDistance, Space.World);
+		Vector3 targetTranslate = new Vector3();
+
+		//Move the player forward if we aren't comboing on anything
+		if (playerAttack.curTarget == null) {
+			targetTranslate = playerTransform.forward * attackDistance;
+		}
+		//Else move the player towards the comboed target
+		else {
+			Vector3 targetDir = playerAttack.curTarget.position - playerTransform.position;
+			playerTransform.forward = targetDir.normalized;
+			thisPlayer.targetForward = playerTransform.forward;
+			targetTranslate = targetDir - playerTransform.forward*((playerTransform.lossyScale.x + playerAttack.curTarget.lossyScale.x)/2f);
+		}
+
+		playerTransform.Translate(targetTranslate, Space.World);
 		yield return new WaitForSeconds(punchTime);
 		fists[0].SetActive(false);
 
@@ -114,7 +129,21 @@ public class AttackManager : MonoBehaviour {
 	IEnumerator PunchPunch() {
 		fists[1].SetActive(true);
 		curComboTime = comboTimeReset;
-		playerTransform.Translate(playerTransform.forward * attackDistance, Space.World);
+
+		Vector3 targetTranslate = new Vector3();
+		//Move the player forward if we aren't comboing on anything
+		if (playerAttack.curTarget == null) {
+			targetTranslate = playerTransform.forward * attackDistance;
+		}
+		//Else move the player towards the comboed target
+		else {
+			Vector3 targetDir = playerAttack.curTarget.position - playerTransform.position;
+			playerTransform.forward = targetDir.normalized;
+			thisPlayer.targetForward = playerTransform.forward;
+			targetTranslate = targetDir - playerTransform.forward * ((playerTransform.lossyScale.x + playerAttack.curTarget.lossyScale.x) / 2f);
+		}
+
+		playerTransform.Translate(targetTranslate, Space.World);
 		yield return new WaitForSeconds(punchTime);
 		fists[1].SetActive(false);
 
@@ -128,18 +157,40 @@ public class AttackManager : MonoBehaviour {
 
 	//FLURRY PUNCH
 	IEnumerator PunchPunchPunchPunch() {
-		int lungeFrames = 3;											//Number of frames the player spends lunges forward
+		curComboTime = comboTimeReset;
+		float lungeDistance = 0.5f;                                     //Distance the player lunges in front of them
+		float lungeTime = 0.05f;
 
-		float lungeSpeed = 0.5f;                                        //Distance the player lunges in front of them
 		int punchesThrown = 4;                                          //Number of punches thrown during the flurry
 		WaitForSeconds flurryPunchTime = new WaitForSeconds(0.1f);      //Time between punches during the flurry
 
+		Vector3 targetTranslate = new Vector3();
+		//Move the player forward if we aren't comboing on anything
+		if (playerAttack.curTarget == null) {
+			targetTranslate = playerTransform.forward * lungeDistance;
+		}
+		//Else move the player towards the comboed target
+		else {
+			Vector3 targetDir = playerAttack.curTarget.position - playerTransform.position;
+			playerTransform.forward = targetDir.normalized;
+			thisPlayer.targetForward = playerTransform.forward;
+			targetTranslate = targetDir - playerTransform.forward * ((playerTransform.lossyScale.x + playerAttack.curTarget.lossyScale.x) / 2f);
+		}
+
 		//Character lunges forward...
-		for (int i = 0; i < lungeFrames; i++) {
-			curComboTime = comboTimeReset;
-			playerTransform.Translate(playerTransform.forward * lungeSpeed, Space.World);
+		Vector3 startPos = playerTransform.position;
+		Vector3 endPos = playerTransform.position + targetTranslate;
+		float lungeTImeElapsed = 0;
+		while (lungeTImeElapsed < lungeTime) {
+			lungeTImeElapsed += Time.deltaTime;
+
+			thisPlayer.targetForward = playerTransform.forward = targetTranslate.normalized;
+			playerTransform.Translate(targetTranslate*Time.deltaTime, Space.World);
+
 			yield return null;
 		}
+
+		curComboTime = comboTimeReset;
 
 		//...and throws a flurry of punches
 		thisPlayer.lockSpinning = true;

@@ -3,7 +3,8 @@ using System.Collections;
 
 public class Attack : MonoBehaviour {
 
-	Character thisPlayer;						//Reference to the player component
+	Character thisPlayer;                       //Reference to the player component
+	public Transform curTarget;						//The transform of the enemy we're currently combo-ing
 	public AttackNode rootNode;						//Starting node that every combo starts at
 	public AttackNode curNode;                      //Current node in the player's combo that determines the next attack
 

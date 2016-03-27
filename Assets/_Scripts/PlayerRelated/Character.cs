@@ -30,7 +30,7 @@ public class Character : MonoBehaviour, DamageableObject {
 	Collider thisCollider;                  //Reference to the attached Collider
 	MeshRenderer thisMesh;
 	TextMesh thisText;
-	Vector3 targetForward;					//Which direction the player should attempt to be facing
+	public Vector3 targetForward;					//Which direction the player should attempt to be facing
 	float turnSpeed = 0.4f;                 //(0-1) How quickly the player reaches the desired direction to face
 
 

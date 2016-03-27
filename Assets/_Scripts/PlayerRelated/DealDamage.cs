@@ -8,10 +8,14 @@ public class DealDamage : MonoBehaviour {
 	static public float knockbackScalar = 0f;
 
 	Character thisPlayer;
+	Attack playerAttack;
+	ParticleSystem impactParticleSystem;
 
 	// Use this for initialization
 	void Start () {
 		thisPlayer = GetComponentInParent<Character>();
+		playerAttack = GetComponentInParent<Attack>();
+		impactParticleSystem = thisPlayer.gameObject.GetComponentInChildren<ParticleSystem>();
 	}
 	
 	// Update is called once per frame
@@ -31,7 +35,18 @@ public class DealDamage : MonoBehaviour {
 		//Calculate damage, and apply it
 		float damageDone = baseDamage;
 		hitObj.TakeDamage(baseDamage, new Vector3(0, 0, 0));
+
+		//Lock on to the target
+		playerAttack.curTarget = other.transform;
+
+		//Add to the player's combo meter
 		thisPlayer.health += damageDone / 10f;
+
+		//Add camera shake
 		CameraFollow.S.CameraShake(0.1f, 0.75f);
+
+		//Play the impact particle system
+		impactParticleSystem.gameObject.transform.position = transform.position;
+		impactParticleSystem.Play();
 	}
 }
