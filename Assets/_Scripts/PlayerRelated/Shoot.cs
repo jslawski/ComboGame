@@ -29,7 +29,7 @@ public class Shoot : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
 	//The player is present, pressing Y, not currently shooting, not currently attacking, and has bullets to shoot
-	if (thisPlayer.curDevice != null && thisPlayer.curDevice.RightStick && !thisPlayer.attacking && !thisPlayer.shooting && bulletsLeft > 0) {
+	if (thisPlayer.curDevice != null && thisPlayer.curDevice.Action4 && !thisPlayer.attacking && !thisPlayer.shooting && bulletsLeft > 0) {
 			thisPlayer.shooting = true;
 			thisPlayer.GetComponent<Rigidbody>().velocity = Vector3.zero;
 
@@ -40,17 +40,15 @@ public class Shoot : MonoBehaviour {
 	IEnumerator FireBullet() {
 		//Continue looping as long as the player has bullets to shoot and is still holdin the shoot button
 		//The player must also not be mid-attack
-		while (thisPlayer.curDevice.RightStick && bulletsLeft > 0) {
-			Vector2 stickVector = thisPlayer.curDevice.RightStick.Vector;
-			Vector3 fireDirection = new Vector3(stickVector.x, 0, stickVector.y);
+		while (thisPlayer.curDevice.Action4 && bulletsLeft > 0) {
 
-			curBullet = Instantiate(bulletPrefab, thisPlayer.transform.position + fireDirection, new Quaternion()) as Bullet;
+			curBullet = Instantiate(bulletPrefab, thisPlayer.transform.position + thisPlayer.transform.forward, new Quaternion()) as Bullet;
 
 			Transform homingTarget;
-			Vector3 homingDir = HomingDirection(out homingTarget, fireDirection);
+			Vector3 homingDir = HomingDirection(out homingTarget);
 			thisPlayer.transform.forward = (homingDir != Vector3.zero) ? homingDir : thisPlayer.transform.forward;
 
-			Vector3 bulletDirection = (homingDir != Vector3.zero) ? homingDir : fireDirection;
+			Vector3 bulletDirection = thisPlayer.transform.forward;
 
 			curBullet.GetComponent<Rigidbody>().velocity = bulletDirection * curBullet.bulletSpeed;
 			curBullet.thisPlayer = thisPlayer;
@@ -88,9 +86,9 @@ public class Shoot : MonoBehaviour {
 	}
 
 	//Will return a vector facing towards the nearest target to the dash direction, or Vector3.zero if there was no target found close enough
-	Vector3 HomingDirection(out Transform homingTarget, Vector3 fireDirection) {
+	Vector3 HomingDirection(out Transform homingTarget) {
 		Vector3 startPos = thisPlayer.transform.position;
-		Vector3 defaultEndPos = thisPlayer.transform.position + fireDirection * shootDistance;
+		Vector3 defaultEndPos = thisPlayer.transform.position + thisPlayer.transform.forward * shootDistance;
 
 		float maxDot = 0.7f;
 		homingTarget = null;
