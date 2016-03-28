@@ -30,6 +30,9 @@ public class GameManager : MonoBehaviour {
 	}
 
 	IEnumerator GenerateMaze() {
+		if (mazePrefab == null) {
+			yield break;
+		}
 		mazeInstance = Instantiate(mazePrefab) as Maze;
 		yield return StartCoroutine(mazeInstance.Generate());
 		//Instantiate the player and enable camera follow

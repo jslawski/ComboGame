@@ -2,7 +2,6 @@
 using System.Collections;
 
 public class DealDamage : MonoBehaviour {
-
 	float baseDamage = 10f;
 	static public float damageMultiplier = 1f;
 	static public float knockbackScalar = 0f;
@@ -10,17 +9,14 @@ public class DealDamage : MonoBehaviour {
 	Character thisPlayer;
 	Attack playerAttack;
 	ParticleSystem impactParticleSystem;
+	PlayerLight playerLight;
 
 	// Use this for initialization
 	void Start () {
-		thisPlayer = GetComponentInParent<Character>();
-		playerAttack = GetComponentInParent<Attack>();
+		thisPlayer = GameManager.S.player;
+		playerAttack = thisPlayer.GetComponent<Attack>();
 		impactParticleSystem = thisPlayer.gameObject.GetComponentInChildren<ParticleSystem>();
-	}
-	
-	// Update is called once per frame
-	void Update () {
-	
+		playerLight = thisPlayer.gameObject.GetComponentInChildren<PlayerLight>();
 	}
 
 	void OnTriggerEnter (Collider other) {
@@ -48,5 +44,8 @@ public class DealDamage : MonoBehaviour {
 		//Play the impact particle system
 		impactParticleSystem.gameObject.transform.position = transform.position;
 		impactParticleSystem.Play();
+
+		//Strobe the light
+		playerLight.Strobe(0.1f);
 	}
 }
