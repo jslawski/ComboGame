@@ -94,7 +94,9 @@ public class AttackManager : MonoBehaviour {
 			S.curComboTime -= Time.fixedDeltaTime;
 		}
 		else {
+			//JPS:  STOP USING THESE FLAGS!!!
 			thisPlayer.attacking = false;
+			
 			//Reset the combo chain
 			playerAttack.curNode = playerAttack.rootNode;
 			playerAttack.curTarget = null;
@@ -180,9 +182,9 @@ public class AttackManager : MonoBehaviour {
 		//Character lunges forward...
 		Vector3 startPos = playerTransform.position;
 		Vector3 endPos = playerTransform.position + targetTranslate;
-		float lungeTImeElapsed = 0;
-		while (lungeTImeElapsed < lungeTime) {
-			lungeTImeElapsed += Time.deltaTime;
+		float lungeTimeElapsed = 0;
+		while (lungeTimeElapsed < lungeTime) {
+			lungeTimeElapsed += Time.deltaTime;
 
 			thisPlayer.targetForward = playerTransform.forward = targetTranslate.normalized;
 			playerTransform.Translate(targetTranslate*Time.deltaTime, Space.World);

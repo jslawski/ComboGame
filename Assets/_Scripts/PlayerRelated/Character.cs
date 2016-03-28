@@ -38,6 +38,7 @@ public class Character : MonoBehaviour, DamageableObject {
 	bool controlsDisabled = false;
 
 	public bool attacking = false;
+	public bool shooting = false;
 	public bool lockSpinning = false;
 	public bool invincible = false;
 

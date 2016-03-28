@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using UnityEngine.UI;
 
 public class Attack : MonoBehaviour {
 
@@ -9,7 +10,9 @@ public class Attack : MonoBehaviour {
 	public AttackNode curNode;                      //Current node in the player's combo that determines the next attack
 
 	float curInputBuffer = 0;				//Player can only queue up the next attack when this is zero
-	float inputBuffer = 0.2f;				//Amount of buffer time before the next attack button input gets queued up for an attack
+	float inputBuffer = 0.2f;               //Amount of buffer time before the next attack button input gets queued up for an attack
+
+	
 
 	// Use this for initialization
 	void Start () {
@@ -17,6 +20,8 @@ public class Attack : MonoBehaviour {
 
 		rootNode = GetComponent<AttackTree>().mainTree;
 		curNode = rootNode;
+
+		
 	}
 	
 	void EnqueueAttack() {
@@ -42,21 +47,23 @@ public class Attack : MonoBehaviour {
 
 	// Update is called once per frame
 	void Update() {
-		//Execute punch if there is a device, the player presses X, the current input buffer is 0, and the current node has a "punch" child
-		if (thisPlayer.curDevice != null && thisPlayer.curDevice.Action3.WasPressed && curInputBuffer <= 0 && curNode.punch != null) {
+		//Execute punch if there is a device, the player presses X, the current input buffer is 0, the player isn't shooting, and the current node has a "punch" child
+		if (thisPlayer.curDevice != null && thisPlayer.curDevice.Action3.WasPressed && curInputBuffer <= 0 && !thisPlayer.shooting && curNode.punch != null) {
 			//Set the next node in the combo chain
 			curNode = curNode.punch;
 
 			EnqueueAttack();
 		}
 
-		//Execute kick if there is a device, the player presses A, the current input buffer is 0, and the current node has a "kick" child
-		else if (thisPlayer.curDevice != null && thisPlayer.curDevice.Action1.WasPressed && curInputBuffer <= 0 && curNode.kick != null) {
+		//Execute kick if there is a device, the player presses A, the current input buffer is 0, the player isn't shooting, and the current node has a "kick" child
+		else if (thisPlayer.curDevice != null && thisPlayer.curDevice.Action1.WasPressed && curInputBuffer <= 0 && !thisPlayer.shooting && curNode.kick != null) {
 			//Set the next node in the combo chain
 			curNode = curNode.kick;
 
 			EnqueueAttack();
 		}
+		
+
 	}
 
 	void FixedUpdate() {
