@@ -24,14 +24,14 @@ public class LevelUpDisplay : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
 		if (Input.GetKeyDown("space")) {
-			LevelUp();
+			LevelUp(GameManager.S.player);
 		}
 	}
 
-	public void LevelUp() {
-		StartCoroutine(LevelUpCoroutine());
+	public void LevelUp(Character thisPlayer) {
+		StartCoroutine(LevelUpCoroutine(thisPlayer));
 	}
-	IEnumerator LevelUpCoroutine() {
+	IEnumerator LevelUpCoroutine(Character player) {
 		Vector2 startOffset = new Vector2(0, Screen.height);
 		Vector2 endOffset = Vector2.zero;
 		thisRect.offsetMin = thisRect.offsetMax = startOffset;
@@ -53,8 +53,27 @@ public class LevelUpDisplay : MonoBehaviour {
 		}
 
 		//Wait for player input
-		//PLACEHOLDER WAITFORSECONDS
-		yield return new WaitForSeconds(4);
+		while (true) {
+			if (player.curDevice != null) {
+				if (player.curDevice.Action1.WasPressed) {
+					player.gameObject.AddComponent(levelUpAbilities[0].type);
+					break;
+				}
+				else if (player.curDevice.Action2.WasPressed) {
+					player.gameObject.AddComponent(levelUpAbilities[1].type);
+					break;
+				}
+				else if (player.curDevice.Action3.WasPressed) {
+					player.gameObject.AddComponent(levelUpAbilities[2].type);
+					break;
+				}
+				else if (player.curDevice.Action4.WasPressed) {
+					player.gameObject.AddComponent(levelUpAbilities[3].type);
+					break;
+				}
+			}
+			yield return 0;
+		}
 
 		//Lerp out
 		timeElapsed = 0;

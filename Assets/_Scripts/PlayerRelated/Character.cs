@@ -73,12 +73,6 @@ public class Character : MonoBehaviour, DamageableObject {
 		get { return playerExperience; }
 		set {
 			playerExperience = value;
-			if (playerExperience > expForNextLevel) {
-				playerExperience -= expForNextLevel;
-				playerLevel++;
-				expForNextLevel = GetExpNeededForNextLevel();
-				print("PLAYER LEVELED UP TO LEVEL " + playerLevel + "!\nExperience needed to level up to Level " + (playerLevel+1) + ": " + expForNextLevel);
-			}
 			expBar.targetPercent = (float)playerExperience / (float)expForNextLevel;
 		}
 	}
@@ -123,6 +117,11 @@ public class Character : MonoBehaviour, DamageableObject {
 		thisText.text = ((int)(health)).ToString();
 
 		CharacterMovement();
+
+		//Allow the player to level up when they have enough experience and press Start
+		if (curDevice.MenuWasPressed && experience >= expForNextLevel) {
+			LevelUp();
+		}
 	}
 
 	void CharacterMovement() {
@@ -253,5 +252,18 @@ public class Character : MonoBehaviour, DamageableObject {
 			return;
 		}
 		print("<color=red>TakeDamage() not implemented yet.</color>");
+	}
+
+	void LevelUp() {
+		if (playerExperience < expForNextLevel) {
+			return;
+		}
+
+		LevelUpDisplay.S.LevelUp(this);
+
+		playerExperience -= expForNextLevel;
+		playerLevel++;
+		expForNextLevel = GetExpNeededForNextLevel();
+		print("PLAYER LEVELED UP TO LEVEL " + playerLevel + "!\nExperience needed to level up to Level " + (playerLevel + 1) + ": " + expForNextLevel);
 	}
 }

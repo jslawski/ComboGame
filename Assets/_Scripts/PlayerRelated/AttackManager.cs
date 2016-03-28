@@ -107,18 +107,12 @@ public class AttackManager : MonoBehaviour {
 	IEnumerator Punch() {
 		fists[0].SetActive(true);
 		curComboTime = comboTimeReset;
-		Vector3 targetTranslate = new Vector3();
 
 		//Move the player forward if we aren't comboing on anything
-		if (playerAttack.curTarget == null) {
-			targetTranslate = playerTransform.forward * attackDistance;
-		}
+		Vector3 targetTranslate = playerTransform.forward * attackDistance;
 		//Else move the player towards the comboed target
-		else {
-			Vector3 targetDir = playerAttack.curTarget.position - playerTransform.position;
-			playerTransform.forward = targetDir.normalized;
-			thisPlayer.targetForward = playerTransform.forward;
-			targetTranslate = targetDir - playerTransform.forward*((playerTransform.lossyScale.x + playerAttack.curTarget.lossyScale.x)/2f);
+		if (playerAttack.curTarget != null) {
+			targetTranslate = GetTargetVector();
 		}
 
 		playerTransform.Translate(targetTranslate, Space.World);
@@ -131,18 +125,12 @@ public class AttackManager : MonoBehaviour {
 	IEnumerator PunchPunch() {
 		fists[1].SetActive(true);
 		curComboTime = comboTimeReset;
-
-		Vector3 targetTranslate = new Vector3();
+		
 		//Move the player forward if we aren't comboing on anything
-		if (playerAttack.curTarget == null) {
-			targetTranslate = playerTransform.forward * attackDistance;
-		}
+		Vector3 targetTranslate = playerTransform.forward * attackDistance;
 		//Else move the player towards the comboed target
-		else {
-			Vector3 targetDir = playerAttack.curTarget.position - playerTransform.position;
-			playerTransform.forward = targetDir.normalized;
-			thisPlayer.targetForward = playerTransform.forward;
-			targetTranslate = targetDir - playerTransform.forward * ((playerTransform.lossyScale.x + playerAttack.curTarget.lossyScale.x) / 2f);
+		if (playerAttack.curTarget != null) {
+			targetTranslate = GetTargetVector();
 		}
 
 		playerTransform.Translate(targetTranslate, Space.World);
@@ -166,17 +154,11 @@ public class AttackManager : MonoBehaviour {
 		int punchesThrown = 4;                                          //Number of punches thrown during the flurry
 		WaitForSeconds flurryPunchTime = new WaitForSeconds(0.1f);      //Time between punches during the flurry
 
-		Vector3 targetTranslate = new Vector3();
 		//Move the player forward if we aren't comboing on anything
-		if (playerAttack.curTarget == null) {
-			targetTranslate = playerTransform.forward * lungeDistance;
-		}
+		Vector3 targetTranslate = playerTransform.forward * lungeDistance;
 		//Else move the player towards the comboed target
-		else {
-			Vector3 targetDir = playerAttack.curTarget.position - playerTransform.position;
-			playerTransform.forward = targetDir.normalized;
-			thisPlayer.targetForward = playerTransform.forward;
-			targetTranslate = targetDir - playerTransform.forward * ((playerTransform.lossyScale.x + playerAttack.curTarget.lossyScale.x) / 2f);
+		if (playerAttack.curTarget != null) {
+			targetTranslate = GetTargetVector();
 		}
 
 		//Character lunges forward...
@@ -186,8 +168,11 @@ public class AttackManager : MonoBehaviour {
 		while (lungeTimeElapsed < lungeTime) {
 			lungeTimeElapsed += Time.deltaTime;
 
-			thisPlayer.targetForward = playerTransform.forward = targetTranslate.normalized;
-			playerTransform.Translate(targetTranslate*Time.deltaTime, Space.World);
+			//Check for Vector3.zero to avoid weird look rotation == zero vector bug
+			if (targetTranslate != Vector3.zero) {
+				thisPlayer.targetForward = playerTransform.forward = targetTranslate.normalized;
+			}
+			playerTransform.Translate(targetTranslate*Time.deltaTime / lungeTime, Space.World);
 
 			yield return null;
 		}
@@ -221,10 +206,10 @@ public class AttackManager : MonoBehaviour {
 	//MASSIVE PUNCH
 	IEnumerator PunchPunchPunchPunchPunch() {
 		int backupFrames = 15;                                          //Number of frames the player spends backing up
-		int lungeFrames = 3;                                            //Number of frames the player spends lunges forward
 
 		float backupSpeed = 0.05f;                                      //Speed the player steps back to prepare for attack
-		float lungeSpeed = 0.5f;                                        //Distance the player lunges in front of them
+		float lungeTime = 0.05f;
+		float lungeDistance = 1f;
 
 		WaitForSeconds massivePunchCooldown = new WaitForSeconds(0.5f);     //Time to wait until the attack "finishes"
 
@@ -235,10 +220,26 @@ public class AttackManager : MonoBehaviour {
 			yield return null;
 		}
 
-		//...Then lunges forward...
-		for (int i = 0; i < lungeFrames; i++) {
-			curComboTime = comboTimeReset;
-			playerTransform.Translate(playerTransform.forward * lungeSpeed, Space.World);
+		//Move the player forward if we aren't comboing on anything
+		Vector3 targetTranslate = playerTransform.forward * lungeDistance;
+		//Else move the player towards the comboed target
+		if (playerAttack.curTarget != null) {
+			targetTranslate = GetTargetVector();
+		}
+
+		//Character lunges forward...
+		Vector3 startPos = playerTransform.position;
+		Vector3 endPos = playerTransform.position + targetTranslate;
+		float lungeTImeElapsed = 0;
+		while (lungeTImeElapsed < lungeTime) {
+			lungeTImeElapsed += Time.deltaTime;
+
+			//Check for Vector3.zero to avoid weird look rotation == zero vector bug
+			if (targetTranslate != Vector3.zero) {
+				thisPlayer.targetForward = playerTransform.forward = targetTranslate.normalized;
+			}
+			playerTransform.Translate(targetTranslate * Time.deltaTime / lungeTime, Space.World);
+
 			yield return null;
 		}
 
@@ -278,7 +279,15 @@ public class AttackManager : MonoBehaviour {
 	IEnumerator Kick() {
 		legs[0].SetActive(true);
 		curComboTime = comboTimeReset;
-		playerTransform.Translate(playerTransform.forward * attackDistance, Space.World);
+
+		//Move the player forward if we aren't comboing on anything
+		Vector3 targetTranslate = playerTransform.forward * attackDistance;
+		//Else move the player towards the comboed target
+		if (playerAttack.curTarget != null) {
+			targetTranslate = GetTargetVector();
+		}
+
+		playerTransform.Translate(targetTranslate, Space.World);
 		yield return new WaitForSeconds(kickTime);
 		legs[0].SetActive(false);
 
@@ -288,7 +297,15 @@ public class AttackManager : MonoBehaviour {
 	IEnumerator KickKick() {
 		legs[1].SetActive(true);
 		curComboTime = comboTimeReset;
-		playerTransform.Translate(playerTransform.forward * attackDistance, Space.World);
+
+		//Move the player forward if we aren't comboing on anything
+		Vector3 targetTranslate = playerTransform.forward * attackDistance;
+		//Else move the player towards the comboed target
+		if (playerAttack.curTarget != null) {
+			targetTranslate = GetTargetVector();
+		}
+
+		playerTransform.Translate(targetTranslate, Space.World);
 		yield return new WaitForSeconds(kickTime);
 		legs[1].SetActive(false);
 
@@ -297,18 +314,34 @@ public class AttackManager : MonoBehaviour {
 
 	//STORM KICK
 	IEnumerator KickKickKick() {
-		int lungeFrames = 2;                //Number of frames the player spends lunges forward
+		float lungeTime = 0.05f;                //Number of frames the player spends lunges forward
 
-		float lungeSpeed = 0.5f;            //Distance the player lunges in front of them
+		float lungeDistance = 0.5f;            //Distance the player lunges in front of them
 
 		WaitForSeconds stormKickTime = new WaitForSeconds(0.75f);           //How long a spin kick lasts
 
 		curComboTime = comboTimeReset;
 
-		//Player lunges forward
-		for (int i = 0; i < lungeFrames; i++) {
-			curComboTime = comboTimeReset;
-			playerTransform.Translate(playerTransform.forward * lungeSpeed, Space.World);
+		//Move the player forward if we aren't comboing on anything
+		Vector3 targetTranslate = playerTransform.forward * lungeDistance;
+		//Else move the player towards the comboed target
+		if (playerAttack.curTarget != null) {
+			targetTranslate = GetTargetVector();
+		}
+
+		//Character lunges forward...
+		Vector3 startPos = playerTransform.position;
+		Vector3 endPos = playerTransform.position + targetTranslate;
+		float lungeTImeElapsed = 0;
+		while (lungeTImeElapsed < lungeTime) {
+			lungeTImeElapsed += Time.deltaTime;
+
+			//Check for Vector3.zero to avoid weird look rotation == zero vector bug
+			if (targetTranslate != Vector3.zero) {
+				thisPlayer.targetForward = playerTransform.forward = targetTranslate.normalized;
+			}
+			playerTransform.Translate(targetTranslate * Time.deltaTime / lungeTime, Space.World);
+
 			yield return null;
 		}
 
@@ -326,10 +359,10 @@ public class AttackManager : MonoBehaviour {
 	//SPIN KICK
 	IEnumerator KickKickKickKick() {
 		int backupFrames = 15;              //Number of frames the player spends backing up
-		int lungeFrames = 5;				//Number of frames the player spends lunges forward
+		float lungeTime = 0.1f;				//Number of frames the player spends lunges forward
 
 		float backupSpeed = 0.05f;			//Speed the player steps back to prepare for attack
-		float lungeSpeed = 0.5f;            //Distance the player lunges in front of them
+		float lungeDistance = 1f;            //Distance the player lunges in front of them
 
 		WaitForSeconds spinKickTime = new WaitForSeconds(1f);           //How long a spin kick lasts
 
@@ -342,10 +375,26 @@ public class AttackManager : MonoBehaviour {
 			yield return null;
 		}
 
-		//...Then lunges forward...
-		for (int i = 0; i < lungeFrames; i++) {
-			curComboTime = comboTimeReset;
-			playerTransform.Translate(playerTransform.forward * lungeSpeed, Space.World);
+		//Move the player forward if we aren't comboing on anything
+		Vector3 targetTranslate = playerTransform.forward * lungeDistance;
+		//Else move the player towards the comboed target
+		if (playerAttack.curTarget != null) {
+			targetTranslate = GetTargetVector();
+		}
+
+		//Character lunges forward...
+		Vector3 startPos = playerTransform.position;
+		Vector3 endPos = playerTransform.position + targetTranslate;
+		float lungeTImeElapsed = 0;
+		while (lungeTImeElapsed < lungeTime) {
+			lungeTImeElapsed += Time.deltaTime;
+
+			//Check for Vector3.zero to avoid weird look rotation == zero vector bug
+			if (targetTranslate != Vector3.zero) {
+				thisPlayer.targetForward = playerTransform.forward = targetTranslate.normalized;
+			}
+			playerTransform.Translate(targetTranslate * Time.deltaTime / lungeTime, Space.World);
+
 			yield return null;
 		}
 
@@ -388,5 +437,15 @@ public class AttackManager : MonoBehaviour {
 		ResetToPunch();
 
 		yield return null;
+	}
+
+	Vector3 GetTargetVector() {
+		Vector3 targetDir = playerAttack.curTarget.position - playerTransform.position;
+		//Ignore differences in height
+		targetDir.y = 0;
+
+		playerTransform.forward = targetDir.normalized;
+		thisPlayer.targetForward = playerTransform.forward;
+		return targetDir - playerTransform.forward * ((playerTransform.lossyScale.x + playerAttack.curTarget.lossyScale.x) / 2f);
 	}
 }
