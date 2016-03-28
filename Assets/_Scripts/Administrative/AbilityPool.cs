@@ -48,7 +48,7 @@ public class AbilityPool : MonoBehaviour {
 				ActivatedAbility temp = GameManager.S.player.gameObject.AddComponent(subclass) as ActivatedAbility;
 				//Remember all subclasses of ActivatedAbility
 				abilitiesInPool.Add(AbilityInfo.Clone(temp.info));
-				//Destroy(temp);
+				Destroy(temp);
 			}
 		}
 
