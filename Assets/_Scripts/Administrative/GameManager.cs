@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 public class GameManager : MonoBehaviour {
 	public static GameManager S;
@@ -14,7 +15,11 @@ public class GameManager : MonoBehaviour {
 	public Maze mazePrefab;
 	Maze mazeInstance;
 
-	float experienceDropDelay = 0.1f;		//Time in seconds between each experience dropped by an enemy
+	float experienceDropDelay = 0.1f;       //Time in seconds between each experience dropped by an enemy
+	public static int enemiesAggroed = 0;
+	public static readonly int maxAggroEnemies = 4;
+
+	bool inBulletTimeCoroutine = false;
 
 	// Use this for initialization
 	void Awake () {
@@ -26,7 +31,49 @@ public class GameManager : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-	
+		//DEBUG BULLET TIME
+		if (Input.GetKeyDown(",")) {
+			StartBulletTime(0.5f);
+		}
+		if (Input.GetKeyDown(".")) {
+			EndBulletTime();
+		}
+	}
+
+	public void StartBulletTime(float timescale, float realTimeDuration = float.MaxValue) {
+		if (!inBulletTimeCoroutine) {
+			StartCoroutine(BulletTimeCoroutine(timescale, realTimeDuration));
+		}
+	}
+	public void EndBulletTime() {
+		if (inBulletTimeCoroutine) {
+			StopCoroutine("BulletTimeCoroutine");
+			inBulletTimeCoroutine = false;
+			Time.timeScale = 1;
+			Time.fixedDeltaTime = 0.02f;
+		}
+	}
+	IEnumerator BulletTimeCoroutine(float timescale, float realTimeDuration) {
+		inBulletTimeCoroutine = true;
+
+		//We need to keep track of real time passed while modifying timescales
+		float realTimeAtStart = Time.realtimeSinceStartup;
+		Time.timeScale *= timescale;
+		Time.fixedDeltaTime *= timescale;
+
+		//print("Time.timeScale: " + Time.timeScale);
+		float timeElapsed = Time.realtimeSinceStartup - realTimeAtStart;
+		while (timeElapsed < realTimeDuration) {
+			timeElapsed = Time.realtimeSinceStartup - realTimeAtStart;
+			yield return null;
+		}
+
+		//Restore normal timescale
+		Time.timeScale /= timescale;
+		Time.fixedDeltaTime /= timescale;
+		//print("Time.timeScale: " + Time.timeScale);
+
+		inBulletTimeCoroutine = false;
 	}
 
 	IEnumerator GenerateMaze() {

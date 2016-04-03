@@ -73,7 +73,7 @@ public class Character : MonoBehaviour, DamageableObject {
 		get { return playerExperience; }
 		set {
 			playerExperience = value;
-			expBar.targetPercent = (float)playerExperience / (float)expForNextLevel;
+			expBar.targetPercent = Mathf.Min(1,(float)playerExperience / (float)expForNextLevel);
 		}
 	}
 
@@ -138,10 +138,10 @@ public class Character : MonoBehaviour, DamageableObject {
 		//Controller movement
 		if (curDevice != null) {
 			//Change back to normal-time
-			if (!curDevice.Action1) {
-				Time.timeScale = 1;
-				Time.fixedDeltaTime = 0.02f;
-			}
+			//if (!curDevice.Action1) {
+			//	Time.timeScale = 1;
+			//	Time.fixedDeltaTime = 0.02f;
+			//}
 
 			//Player turns and moves at the same time
 			if (curDevice.LeftStick.Vector.magnitude != 0) {

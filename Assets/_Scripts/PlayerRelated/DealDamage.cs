@@ -3,6 +3,7 @@ using System.Collections;
 
 public class DealDamage : MonoBehaviour {
 	float baseDamage = 10f;
+	static public float stunDuration = 0f;
 	static public float damageMultiplier = 1f;
 	static public float knockbackScalar = 0f;
 
@@ -29,8 +30,10 @@ public class DealDamage : MonoBehaviour {
 		}
 
 		//Calculate damage, and apply it
+		Vector3 directionOfEnemy = other.transform.position - thisPlayer.transform.position;
+		directionOfEnemy.y = 0;
 		float damageDone = baseDamage;
-		hitObj.TakeDamage(baseDamage, new Vector3(0, 0, 0));
+		hitObj.TakeDamage(baseDamage, knockbackScalar*directionOfEnemy.normalized, stunDuration);
 
 		//Lock on to the target
 		playerAttack.curTarget = other.transform;

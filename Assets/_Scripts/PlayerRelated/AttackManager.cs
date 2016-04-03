@@ -105,6 +105,9 @@ public class AttackManager : MonoBehaviour {
 
 	/**********Attack Coroutines**********/
 	IEnumerator Punch() {
+		DealDamage.knockbackScalar = 35f;
+		DealDamage.stunDuration = 0.1f;
+
 		fists[0].SetActive(true);
 		curComboTime = comboTimeReset;
 
@@ -123,6 +126,9 @@ public class AttackManager : MonoBehaviour {
 	}
 
 	IEnumerator PunchPunch() {
+		DealDamage.knockbackScalar = 35f;
+		DealDamage.stunDuration = 0.1f;
+
 		fists[1].SetActive(true);
 		curComboTime = comboTimeReset;
 		
@@ -147,6 +153,9 @@ public class AttackManager : MonoBehaviour {
 
 	//FLURRY PUNCH
 	IEnumerator PunchPunchPunchPunch() {
+		DealDamage.knockbackScalar = -2;
+		DealDamage.stunDuration = 0.05f;
+
 		curComboTime = comboTimeReset;
 		float lungeDistance = 0.5f;                                     //Distance the player lunges in front of them
 		float lungeTime = 0.05f;
@@ -205,6 +214,9 @@ public class AttackManager : MonoBehaviour {
 
 	//MASSIVE PUNCH
 	IEnumerator PunchPunchPunchPunchPunch() {
+		DealDamage.knockbackScalar = 100f;
+		DealDamage.stunDuration = 1f;
+
 		int backupFrames = 15;                                          //Number of frames the player spends backing up
 
 		float backupSpeed = 0.05f;                                      //Speed the player steps back to prepare for attack
@@ -212,6 +224,11 @@ public class AttackManager : MonoBehaviour {
 		float lungeDistance = 1f;
 
 		WaitForSeconds massivePunchCooldown = new WaitForSeconds(0.5f);     //Time to wait until the attack "finishes"
+
+		//Camera zoom for added effect
+		CameraFollow.S.CameraZoom(0.3f, 0.5f);
+		//Bullet time for added effect
+		GameManager.S.StartBulletTime(0.4f, 0.75f);
 
 		//Character backs up...
 		for (int i = 0; i < backupFrames; i++) {

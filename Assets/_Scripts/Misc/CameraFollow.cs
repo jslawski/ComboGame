@@ -3,15 +3,22 @@ using System.Collections;
 
 public class CameraFollow : MonoBehaviour {
 	public static CameraFollow S;
+	Camera thisCamera;
 
 	public Transform followObject;		//Object for the camera to follow
 	Vector3 startOffset;                //Starting position of the camera relative to the object it is following
-	Vector3 curOffset;					//Used for camera shake, otherwise == startOffset
+	Vector3 curOffset;                  //Used for camera shake, otherwise == startOffset
+
+	float startSize;					//Initial orthographic size of the camera
+	float curSize;                      //Used for camera zoom, otherwise == startSize
+	float zoomSpeed = 0.1f;				//Percent per frame the camera's orthographic size changes to its target size
 
 	float followSpeed = 0.1f;           //Percent per frame the camera moves towards its target position
 
 	bool inCameraShakeCoroutine = false;
-	float cameraShakeFrequency = 40f;	//How many times per second the random offset for camera shake changes
+	float cameraShakeFrequency = 40f;   //How many times per second the random offset for camera shake changes
+
+	bool inCameraZoomCoroutine = false;
 
 	// Use this for initialization
 	void Start () {
@@ -20,6 +27,9 @@ public class CameraFollow : MonoBehaviour {
 		curOffset = startOffset;
 
 		followObject = GameManager.S.player.gameObject.transform;
+		thisCamera = GetComponent<Camera>();
+		startSize = thisCamera.orthographicSize;
+		curSize = startSize;
 	}
 
 	//DEBUG INPUT FOR CAMERA SHAKE
@@ -27,11 +37,15 @@ public class CameraFollow : MonoBehaviour {
 		if (Input.GetKey("x")) {
 			CameraShake(0.2f, 2);
 		}
+		if (Input.GetKey("z")) {
+			CameraZoom(0.4f, 0.5f);
+		}
 	}
 	
 	//Camera movement in FixedUpdate() for smoother following of the physics calculations
 	void FixedUpdate () {
 		transform.position = Vector3.Lerp(transform.position, followObject.position + curOffset, followSpeed);
+		thisCamera.orthographicSize = Mathf.Lerp(thisCamera.orthographicSize, curSize, zoomSpeed);
 	}
 
 	public void CameraShake(float duration, float intensity) {
@@ -53,5 +67,21 @@ public class CameraFollow : MonoBehaviour {
 
 		curOffset = startOffset;
 		inCameraShakeCoroutine = false;
+	}
+
+	public void CameraZoom(float duration, float percent) {
+		if (!inCameraZoomCoroutine) {
+			StartCoroutine(CameraZoomCoroutine(duration, percent));
+		}
+	}
+	IEnumerator CameraZoomCoroutine(float duration, float percent) {
+		inCameraZoomCoroutine = true;
+
+		//Move the camera offset towards the ground
+		curSize = startSize * percent;
+		yield return new WaitForSeconds(duration);
+		curSize = startSize;
+
+		inCameraZoomCoroutine = false;
 	}
 }
