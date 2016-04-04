@@ -17,7 +17,7 @@ public class GameManager : MonoBehaviour {
 
 	float experienceDropDelay = 0.1f;       //Time in seconds between each experience dropped by an enemy
 	public static int enemiesAggroed = 0;
-	public static readonly int maxAggroEnemies = 4;
+	public static readonly int maxAggroEnemies = 2;
 
 	bool inBulletTimeCoroutine = false;
 
