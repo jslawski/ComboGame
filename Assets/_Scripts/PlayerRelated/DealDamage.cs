@@ -39,7 +39,7 @@ public class DealDamage : MonoBehaviour {
 		playerAttack.curTarget = other.transform;
 
 		//Add to the player's combo meter
-		thisPlayer.health += damageDone / 4f;
+		thisPlayer.health += damageDone / 2f;
 
 		//Add camera shake
 		CameraFollow.S.CameraShake(0.1f, 0.75f);

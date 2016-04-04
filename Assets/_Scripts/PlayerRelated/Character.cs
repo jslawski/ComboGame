@@ -95,7 +95,7 @@ public class Character : MonoBehaviour, DamageableObject {
 		activatedAbilities.Add(this.gameObject.AddComponent<Dash>());
 		maxHealth = 100;
 		health = maxHealth;
-		healthDecayRate = 0.0625f;
+		healthDecayRate = 0.75f;
 		timeBeforeDecay = 1f;
 		movespeed = 3;
 	}
