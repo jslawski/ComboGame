@@ -90,7 +90,7 @@ public class Character : MonoBehaviour, DamageableObject {
 		activatedAbilities.Add(this.gameObject.AddComponent<Dash>());
 		maxHealth = 100;
 		health = maxHealth;
-		healthDecayRate = 0.0625f;
+		healthDecayRate = 0.75f;
 		timeBeforeDecay = 1f;
 		movespeed = 3;
 	}
@@ -251,7 +251,10 @@ public class Character : MonoBehaviour, DamageableObject {
 			print("I scoff at your puny attempts to damage me! (Player is invulnerable)");
 			return;
 		}
-		print("<color=red>TakeDamage() not implemented yet.</color>");
+		playerHealth -= damageIn;
+		if (playerHealth < 0) {
+			playerHealth = 0;
+		}
 	}
 
 	void LevelUp() {
