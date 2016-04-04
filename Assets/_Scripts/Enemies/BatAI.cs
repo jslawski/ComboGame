@@ -66,12 +66,15 @@ public class BatAI : Enemy {
 			distanceToPlayer = (transform.position - aggroTarget.position).magnitude;
 			yield return 0;
 		}
+		yield return new WaitForSeconds(0.5f);
 
 		agent.speed = normalSpeed;
 		timeUntilNextAttack = Random.Range(minTimeBetweenAttacks, maxTimeBetweenAttacks);
 
-		GameManager.enemiesAggroed--;
 		inAttackCoroutine = false;
+
+		yield return new WaitForSeconds(1f);
+		GameManager.enemiesAggroed--;
 	}
 
 	bool IsCloseEnoughToAttack() {

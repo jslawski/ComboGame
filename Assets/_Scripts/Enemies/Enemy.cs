@@ -12,6 +12,10 @@ public class Enemy : MonoBehaviour, DamageableObject {
 	float enemyHealth;
 	float stunDurationLeft;
 
+	protected float attackDamage;
+	protected float attackStunDuration;
+	protected float attackKnockback;
+
 	/*~~~~~~~~~~Properties~~~~~~~~~~*/
 	public float maxHealth {
 		get { return enemyMaxHealth; }
@@ -35,6 +39,10 @@ public class Enemy : MonoBehaviour, DamageableObject {
 		experienceOnDeath = 10;
 		enemyMaxHealth = 100f;
 		enemyHealth = enemyMaxHealth;
+		attackDamage = 10f;
+		attackStunDuration = 0f;
+		attackKnockback = 0f;
+
 		deathParticleSystem = Resources.Load<GameObject>("Prefabs/EnemyDeathParticleSystem");
 	}
 	
@@ -68,5 +76,14 @@ public class Enemy : MonoBehaviour, DamageableObject {
 		particleSystem.GetComponent<SelfDestruct>().timeUntilSelfDestruct = particleSystem.GetComponent<ParticleSystem>().duration;
 
 		Destroy(this.gameObject);
+	}
+
+	void OnCollisionEnter(Collision other) {
+		if (other.gameObject.tag != "Player") {
+			return;
+		}
+
+		DamageableObject hitObj = other.gameObject.GetComponent<DamageableObject>();
+		hitObj.TakeDamage(attackDamage, Vector3.zero, attackStunDuration);
 	}
 }

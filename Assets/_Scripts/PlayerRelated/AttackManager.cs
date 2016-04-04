@@ -105,8 +105,11 @@ public class AttackManager : MonoBehaviour {
 
 	/**********Attack Coroutines**********/
 	IEnumerator Punch() {
+		DealDamage.damageMultiplier = 1f;
 		DealDamage.knockbackScalar = 35f;
 		DealDamage.stunDuration = 0.1f;
+
+		thisPlayer.SetAsInvincible(DealDamage.stunDuration);
 
 		fists[0].SetActive(true);
 		curComboTime = comboTimeReset;
@@ -126,8 +129,11 @@ public class AttackManager : MonoBehaviour {
 	}
 
 	IEnumerator PunchPunch() {
+		DealDamage.damageMultiplier = 1f;
 		DealDamage.knockbackScalar = 35f;
 		DealDamage.stunDuration = 0.1f;
+
+		thisPlayer.SetAsInvincible(DealDamage.stunDuration);
 
 		fists[1].SetActive(true);
 		curComboTime = comboTimeReset;
@@ -153,6 +159,7 @@ public class AttackManager : MonoBehaviour {
 
 	//FLURRY PUNCH
 	IEnumerator PunchPunchPunchPunch() {
+		DealDamage.damageMultiplier = 0.75f;
 		DealDamage.knockbackScalar = -2;
 		DealDamage.stunDuration = 0.05f;
 
@@ -193,6 +200,8 @@ public class AttackManager : MonoBehaviour {
 		fists[0].SetActive(true);
 		yield return flurryPunchTime;
 		for (int i = 0; i < punchesThrown; i++) {
+			thisPlayer.SetAsInvincible(DealDamage.stunDuration);
+
 			curComboTime = comboTimeReset;
 			fists[0].SetActive(!fists[0].activeSelf);
 			fists[1].SetActive(!fists[1].activeSelf);
@@ -214,8 +223,11 @@ public class AttackManager : MonoBehaviour {
 
 	//MASSIVE PUNCH
 	IEnumerator PunchPunchPunchPunchPunch() {
+		DealDamage.damageMultiplier = 2f;
 		DealDamage.knockbackScalar = 100f;
 		DealDamage.stunDuration = 1f;
+
+		thisPlayer.SetAsInvincible(0.25f);
 
 		int backupFrames = 15;                                          //Number of frames the player spends backing up
 

@@ -40,12 +40,17 @@ public class Character : MonoBehaviour, DamageableObject {
 	public bool attacking = false;
 	public bool shooting = false;
 	public bool lockSpinning = false;
-	public bool invincible = false;
+	float invincibilityTimeLeft = 0f;
+
 
 	/*~~~~~~~~~~Properties~~~~~~~~~~*/
 	public float maxHealth {
 		get { return playerMaxHealth; }
 		set { playerMaxHealth = value; }
+	}
+
+	public bool invincible {
+		get { return invincibilityTimeLeft > 0; }
 	}
 
 	public float health {
@@ -111,6 +116,11 @@ public class Character : MonoBehaviour, DamageableObject {
 		float timeInDecay = timeSinceLastCombo - timeBeforeDecay;
 		if (timeInDecay > 0 && health > 0) {
 			health -= timeInDecay * healthDecayRate;
+		}
+
+		//Lose invincibility frames over time
+		if (invincibilityTimeLeft > 0) {
+			invincibilityTimeLeft -= Time.deltaTime;
 		}
 
 		thisMesh.material.SetFloat("_Percent", 1 - health / maxHealth);
@@ -246,12 +256,19 @@ public class Character : MonoBehaviour, DamageableObject {
 		controlsDisabled = false;
 	}
 
+	public void SetAsInvincible(float duration) {
+		invincibilityTimeLeft = Mathf.Max(duration, invincibilityTimeLeft);
+	}
+
 	public void TakeDamage(float damageIn, Vector3 knockback, float stunDuration) {
 		if (invincible) {
-			print("I scoff at your puny attempts to damage me! (Player is invulnerable)");
+			//print("I scoff at your puny attempts to damage me! (Player is invulnerable)");
 			return;
 		}
-		print("<color=red>TakeDamage() not implemented yet.</color>");
+
+		health -= damageIn / 10f;
+		//INSERT KNOCKBACK HERE
+		//INSERT STUN EFFECT HERE
 	}
 
 	void LevelUp() {
